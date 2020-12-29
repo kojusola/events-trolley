@@ -20,7 +20,7 @@ const vendorModel = mongoose.Schema({
     password: {
         type: String,
         required: true,
-        min: 10,
+        min: 6,
         max: 255
     },
     buisnessName: {
@@ -50,6 +50,20 @@ const vendorModel = mongoose.Schema({
     role: {
         type: String,
         required: true,
+    },
+    refreshJWT:{
+        type:Object,
+        token:{
+            type:String,
+            max:500,
+            required:true,
+            default:""
+        },
+        addedAt:{
+            type:Date,
+            required:true,
+            default: Date.now()
+        }
     }
-})
+});
 module.exports = mongoose.model('vendor', vendorModel);

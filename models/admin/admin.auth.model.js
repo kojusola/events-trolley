@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { string } = require('@hapi/joi');
 
 const adminUserSchema = mongoose.Schema({
     fullname: {
@@ -18,7 +19,21 @@ const adminUserSchema = mongoose.Schema({
         required: true,
         min: 3,
         max: 255
+    },
+    refreshJWT:{
+        type:Object,
+        token:{
+            type:String,
+            max:500,
+            required:true,
+            default:""
+        },
+        addedAt:{
+            type:Date,
+            required:true,
+            default: Date.now()
+        }
     }
-}, { timestamps: true })
+},{timestamps: true})
 
 module.exports = mongoose.model('adminUser', adminUserSchema);
