@@ -1,12 +1,10 @@
+require('dotenv').config();
 const customerModel = require('../../../models/user/customer.auth.model');
 const vendorModel = require('../../../models/user/vendor.auth.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const dotenv = require('dotenv');
 const { loginValidation, customerRegisterValidation, vendorRegisterValidation } = require('../../../middlewares/user/user.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
-//dotenv
-dotenv.config();
 
 exports.userLogin = async(req, res) => {
     const { error } = loginValidation(req.body);

@@ -1,9 +1,9 @@
+require('dotenv').config();
 const adminUserModel = require('../../../models/admin/admin.auth.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, registerValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
-require('dotenv').config();
 
 exports.adminLogin = async(req, res) => {
     const { error } = loginValidation(req.body);

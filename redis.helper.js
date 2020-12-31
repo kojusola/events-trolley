@@ -1,7 +1,6 @@
+require('dotenv').config();
 const redis = require("redis");
-const dotenv = require('dotenv');
 const client = redis.createClient(process.env.REDIS_URL);
-dotenv.config();
 
 const setJWT = (key, value)=>{
     return new Promise((resolve, reject) =>{

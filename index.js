@@ -15,11 +15,15 @@ app.use(cors());
 
 //declare routes
 const adminAuth = require('./routes/auth/admin.auth.route');
-const userAuth = require('./routes/auth/user.auth.route')
+const userAuth = require('./routes/auth/user.auth.route');
+const adminPro = require('./routes/profile/admin.profile.route');
+const userPro = require('./routes/profile/user.profile.route');
 
 //use routes
 app.use('/admin', adminAuth);
 app.use('/auth', userAuth);
+app.use('/profile/admin', adminPro);
+app.use('/profile/user', userPro);
 
 // test working app
 app.get('/', (req, res) => {

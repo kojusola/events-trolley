@@ -1,13 +1,12 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const dotenv = require('dotenv');
 const{ getJWT, setJWT }= require('./redis.helper');
 const adminUserModel = require('./models/admin/admin.auth.model');
 const { findOneAndUpdate } = require('./models/admin/admin.auth.model');
-dotenv.config();
 
-const createAccessJWT = async (payload, users) =>{
+const createAccessJWT = async (email, users) =>{
     try{
-        const accessJWT = await jwt.sign({ payload }, process.env.ACCESS_TOKEN_SECRET,{expiresIn:"15m"});
+        const accessJWT = await jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET,{expiresIn:"15m"});
         await setJWT(accessJWT, users)
         return Promise.resolve (accessJWT);
 
@@ -15,8 +14,8 @@ const createAccessJWT = async (payload, users) =>{
         return Promise.reject (error);
     }
 };
-const createRefreshJWT =  (payload) =>{
-    const refreshJWT = jwt.sign({payload}, process.env.REFRESH_TOKEN_SECRET,{expiresIn:"30d"});
+const createRefreshJWT =  (email) =>{
+    const refreshJWT = jwt.sign({email}, process.env.REFRESH_TOKEN_SECRET,{expiresIn:"30d"});
     return Promise.resolve (refreshJWT);
 };
 const storeUserRefreshJWT = (userId, token, model) =>{
@@ -42,20 +41,15 @@ const storeUserRefreshJWT = (userId, token, model) =>{
 }
 
 
- const verifyToken= function (req,res,next){
-    const token = req.header('auth-token');
-    if(!token){
-        return res.status(401).send('Assess Denied');
-    }
+ const verifyAccessToken = function (userJWT){
     try{
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
-        req.user = verified;
-        next()
-    } catch (err){
-        res.status(400).send('Invalid Token');
+        return Promise.resolve(jwt.verify(userJWT,  process.env.ACCESS_TOKEN_SECRET));
+    } catch (error){
+        return Promise.resolve(error);
     }
 }
 module.exports = {
     createAccessJWT,
-    createRefreshJWT,storeUserRefreshJWT
+    createRefreshJWT,storeUserRefreshJWT,
+    verifyAccessToken
 }
