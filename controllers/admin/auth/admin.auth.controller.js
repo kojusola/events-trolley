@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, registerValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
+const {resetPinSchema}= require('../../../models/admin/admin.resetpin.model')
 
 exports.adminLogin = async(req, res) => {
     const { error } = loginValidation(req.body);

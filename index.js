@@ -16,14 +16,21 @@ app.use(cors());
 //declare routes
 const adminAuth = require('./routes/auth/admin.auth.route');
 const userAuth = require('./routes/auth/user.auth.route');
-const adminPro = require('./routes/profile/admin.profile.route');
-const userPro = require('./routes/profile/user.profile.route');
+const adminProfile = require('./routes/profile/admin.profile.route');
+const userProfile = require('./routes/profile/user.profile.route');
+const tokens = require('./routes/token.route');
 
 //use routes
+// log in
 app.use('/admin', adminAuth);
 app.use('/auth', userAuth);
-app.use('/profile/admin', adminPro);
-app.use('/profile/user', userPro);
+//  profile
+app.use('/profile/admin', adminProfile);
+app.use('/profile/user', userProfile);
+// tokens
+app.use('/tokens', tokens);
+
+
 
 // test working app
 app.get('/', (req, res) => {

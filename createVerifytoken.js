@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const{ getJWT, setJWT }= require('./redis.helper');
 const adminUserModel = require('./models/admin/admin.auth.model');
 const { findOneAndUpdate } = require('./models/admin/admin.auth.model');
+const { date } = require('@hapi/joi');
 
 const createAccessJWT = async (email, users) =>{
     try{
@@ -25,7 +26,7 @@ const storeUserRefreshJWT = (userId, token, model) =>{
                 {_id: userId},
                 {$set:{
                     "refreshJWT.token":token,
-                    "refreshJWT.addedAt":Date.now()
+                    "refreshJWT.addedAt":new Date(Date.now())
                 }
             },
             {"new":true}
@@ -48,8 +49,16 @@ const storeUserRefreshJWT = (userId, token, model) =>{
         return Promise.resolve(error);
     }
 }
+const verifyRefreshToken = function (userJWT){
+    try{
+        return Promise.resolve(jwt.verify(userJWT,  process.env.REFRESH_TOKEN_SECRET));
+    } catch (error){
+        return Promise.resolve(error);
+    }
+}
 module.exports = {
     createAccessJWT,
     createRefreshJWT,storeUserRefreshJWT,
-    verifyAccessToken
+    verifyAccessToken,
+    verifyRefreshToken
 }

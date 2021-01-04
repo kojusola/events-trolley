@@ -1,5 +1,5 @@
 const { verifyAccessToken } = require('../createVerifytoken');
-const { getJWT } =require('../redis.helper')
+const { getJWT, deleteJWT } =require('../redis.helper')
 
 
  const verifyToken = async function (req,res,next){
@@ -13,6 +13,7 @@ const { getJWT } =require('../redis.helper')
          req.userId = await userId
          return  next();
     }
+    deleteJWT( authorization )
 return res.status(403).json({message:"Forbidden"})
 }
 
