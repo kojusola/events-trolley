@@ -20,7 +20,7 @@ const adminAuth = require('./routes/auth/admin.auth.route');
 const userAuth = require('./routes/auth/user.auth.route');
 const adminProfile = require('./routes/profile/admin.profile.route');
 const userProfile = require('./routes/profile/user.profile.route');
-const tokens = require('./routes/token.route');
+//const tokens = require('./routes/token.route');
 
 //use routes
 // log in
@@ -30,7 +30,7 @@ app.use('/auth', userAuth);
 app.use('/profile/admin', adminProfile);
 app.use('/profile/user', userProfile);
 // tokens
-app.use('/tokens', tokens);
+//app.use('/tokens', tokens);
 
 
 

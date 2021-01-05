@@ -44,16 +44,15 @@ exports.adminLogin = async(req, res) => {
         //assign token
           //assign assess and refresh tokens
           const accessJWT = await createAccessJWT(admin.email, admin.id)
-          const refreshJWT = await createRefreshJWT(admin.email)
-          const stored =  await storeUserRefreshJWT(admin.id, refreshJWT,adminUserModel)
+          //const refreshJWT = await createRefreshJWT(admin.email)
+          //const stored =  await storeUserRefreshJWT(admin.id, refreshJWT,adminUserModel)
 
 
         res.status(200).json({
             status: true,
             msg: 'Admin logged in succesfully',
             data: {
-                accessJWT,
-                refreshJWT
+                accessJWT
             }
         })
     } catch (error) {

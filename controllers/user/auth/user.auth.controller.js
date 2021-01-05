@@ -4,7 +4,7 @@ const vendorModel = require('../../../models/user/vendor.auth.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, customerRegisterValidation, vendorRegisterValidation } = require('../../../middlewares/user/user.auth.validation');
-const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
+const { createAccessJWT } = require('../../../createVerifytoken')
 
 exports.userLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -46,19 +46,18 @@ exports.userLogin = async(req, res) => {
         }
         //assign assess and refresh tokens
         const accessJWT = await createAccessJWT(user.email, user.id)
-        const refreshJWT = await createRefreshJWT(user.email)
-        if (userRole == 'customer') {
-            const stored =  await storeUserRefreshJWT(user.id, refreshJWT,customerModel)
-        } else if (userRole == 'vendor') {
-            const stored =  await storeUserRefreshJWT(user.id, refreshJWT,vendorModel)
-        }
+        //const refreshJWT = await createRefreshJWT(user.email)
+        // if (userRole == 'customer') {
+        //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,customerModel)
+        // } else if (userRole == 'vendor') {
+        //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,vendorModel)
+        // }
 
         res.status(200).json({
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                accessJWT,
-                refreshJWT
+                accessJWT
             }
         })
 
