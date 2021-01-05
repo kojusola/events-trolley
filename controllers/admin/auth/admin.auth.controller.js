@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, registerValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
-const {resetPinSchema}= require('../../../models/admin/admin.resetpin.model')
+//const {resetPinSchema}= require('../../../models/admin/admin.resetpin.model')
+const {setPasswordResetPin}= require('../../functions.controller')
 
 exports.adminLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -123,4 +124,23 @@ exports.adminRegister = async(req, res) => {
             statusCode: 500
         });
     }
+}
+exports.resetPassword = async (req,res) =>{
+    const {email} = req.body;
+    const adminData = await adminUserModel.findOne({email},(error, data)=>{
+        if(error){
+            console.log(error);
+            res.status(500).send({
+                status: false,
+                msg: 'Can not find data',
+                data: null,
+                statusCode: 500
+        })
+    }
+});
+if(adminData && adminData._id){
+    const setPin = await setPasswordResetPin(email)
+    return res.json(setPin) 
+}
+    res.json({status:"error", message:" If email exists in our database, the password reset will be sent shortly"})
 }

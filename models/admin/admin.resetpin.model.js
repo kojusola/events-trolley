@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { string } = require('@hapi/joi');
 
-const resetPinSchema = mongoose.Schema({
+resetPinSchema = mongoose.Schema({
     email: {
         type: String,
         required: true,
@@ -9,7 +9,7 @@ const resetPinSchema = mongoose.Schema({
         max: 255
     },
     resetpin: {
-        type: Number,
+        type: String,
         required: true,
         min: 6,
         max: 6
