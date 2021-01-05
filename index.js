@@ -7,11 +7,12 @@ const helmet = require('helmet');
 
 // API Security
 // app.use(helmet());
+
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
-//connectDB();
+connectDB();
 
 //declare routes
 const adminAuth = require('./routes/auth/admin.auth.route');
