@@ -4,6 +4,7 @@ const connectDB = require('./config/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
+const port = process.env.PORT || 3000;
 
 // API Security
 // app.use(helmet());
@@ -39,6 +40,6 @@ app.get('/', (req, res) => {
 })
 
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(port, () => {
     console.log('server is running');
 });
