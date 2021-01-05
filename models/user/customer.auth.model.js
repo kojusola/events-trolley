@@ -30,6 +30,20 @@ const customerModel = mongoose.Schema({
     role: {
         type: String,
         required: true,
+    },
+    refreshJWT:{
+        type:Object,
+        token:{
+            type:String,
+            max:500,
+            required:true,
+            default:""
+        },
+        addedAt:{
+            type:Date,
+            required:true,
+            default: Date.now()
+        }
     }
 })
 

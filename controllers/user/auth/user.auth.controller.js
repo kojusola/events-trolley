@@ -1,8 +1,10 @@
+require('dotenv').config();
 const customerModel = require('../../../models/user/customer.auth.model');
 const vendorModel = require('../../../models/user/vendor.auth.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, customerRegisterValidation, vendorRegisterValidation } = require('../../../middlewares/user/user.auth.validation');
+const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
 
 exports.userLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -42,20 +44,21 @@ exports.userLogin = async(req, res) => {
                 statusCode: 401
             })
         }
-        //assign token
-        const token = jwt.sign({
-            id: user._id,
-            expiresIn: Math.floor(Date.now() / 1000) + (60 * 60 * 72),
-        }, process.env.TOKEN_SECRET);
+        //assign assess and refresh tokens
+        const accessJWT = await createAccessJWT(user.email, user.id)
+        const refreshJWT = await createRefreshJWT(user.email)
+        if (userRole == 'customer') {
+            const stored =  await storeUserRefreshJWT(user.id, refreshJWT,customerModel)
+        } else if (userRole == 'vendor') {
+            const stored =  await storeUserRefreshJWT(user.id, refreshJWT,vendorModel)
+        }
 
         res.status(200).json({
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                fullname: user.fullname,
-                email: user.email,
-                id: user.id,
-                token
+                accessJWT,
+                refreshJWT
             }
         })
 
@@ -107,7 +110,7 @@ exports.customerRegister = async(req, res) => {
         }
 
         //hash the password
-        const salt = await bcrypt.genSalt(8);
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
         //prepare data to save
@@ -184,7 +187,7 @@ exports.vendorRegister = async(req, res) => {
         }
 
         //hash the password
-        const salt = await bcrypt.genSalt(8);
+        const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
         //prepare data to save
