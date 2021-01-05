@@ -4,8 +4,9 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, registerValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
-//const {resetPinSchema}= require('../../../models/admin/admin.resetpin.model')
+const resetPinSchema= require('../../../models/admin/admin.resetpin.model')
 const {setPasswordResetPin}= require('../../functions.controller')
+const {emailProcessor} = require('../../../helper/email.helper')
 
 exports.adminLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -51,11 +52,8 @@ exports.adminLogin = async(req, res) => {
             status: true,
             msg: 'Admin logged in succesfully',
             data: {
-                fullname: admin.fullname,
-                email: admin.email,
-                id: admin.id,
                 accessJWT,
-                refreshJWT,stored
+                refreshJWT
             }
         })
     } catch (error) {
@@ -108,7 +106,6 @@ exports.adminRegister = async(req, res) => {
             status: true,
             msg: 'Admin user successfully created',
             data: {
-                id: admin._id,
                 fullname: admin.fullname,
                 email: admin.email,
             },
@@ -140,7 +137,33 @@ exports.resetPassword = async (req,res) =>{
 });
 if(adminData && adminData._id){
     const setPin = await setPasswordResetPin(email)
-    return res.json(setPin) 
+    if (setPin){
+        await emailProcessor(email, setPin.resetpin)
+        return res.json({
+            status : "success",
+            message:"If email exists in our database, the password reset will be sent shortly"
+        });
+    }else{
+    return res.json({
+        status : "success",
+        message: "unable to send email at the moment, please try again later"
+    });
+}
 }
     res.json({status:"error", message:" If email exists in our database, the password reset will be sent shortly"})
+}
+exports.updatePassword = async(req,res)=>{
+    const {email, pin, password } = req.body
+    const getpinData = await resetPinSchema.findOne({email,resetpin:pin},(error, data)=>{
+        if(error){
+            console.log(error);
+            res.status(500).send({
+                status: false,
+                msg: 'Can not find pin data',
+                data: null,
+                statusCode: 500
+        })
+    }
+});
+    return res.json(getpinData)
 }

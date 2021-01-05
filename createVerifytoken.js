@@ -32,7 +32,6 @@ const storeUserRefreshJWT = (userId, token, model) =>{
             {"new":true}
             )
             .then((data)=>{
-                console.log(data)
                 resolve(data)})
             .catch((error)=>reject(error))
     }catch(error){

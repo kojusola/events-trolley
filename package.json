@@ -4,9 +4,9 @@
     "description": "events trolley backend",
     "main": "index.js",
     "scripts": {
-        "start": "cross-env NODE_ENV=production node app.js",
+        "starts": "cross-env NODE_ENV=production node app.js",
         "dev": "cross-env NODE_ENV=development nodemon app.js",
-        "begin": "nodemon index.js"
+        "start": "nodemon index.js"
     },
     "author": "",
     "license": "ISC",
@@ -20,6 +20,7 @@
         "helmet": "^4.2.0",
         "jsonwebtoken": "^8.5.1",
         "mongoose": "^5.11.4",
+        "nodemailer": "^6.4.17",
         "nodemon": "^2.0.6",
         "redis": "^3.0.2"
     }

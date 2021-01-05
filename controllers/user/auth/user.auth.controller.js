@@ -57,9 +57,6 @@ exports.userLogin = async(req, res) => {
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                fullname: user.fullname,
-                email: user.email,
-                id: user.id,
                 accessJWT,
                 refreshJWT
             }

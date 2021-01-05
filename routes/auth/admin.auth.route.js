@@ -4,4 +4,5 @@ const userController = require('../../controllers/admin/auth/admin.auth.controll
 router.post('/register', userController.adminRegister);
 router.post('/login', userController.adminLogin);
 router.post('/reset-password', userController.resetPassword);
+router.patch('/reset-password', userController.updatePassword )
 module.exports = router;
