@@ -197,8 +197,8 @@ exports.vendorRegister = async(req, res) => {
             password: hashedPassword,
             gender: req.body.gender,
             role: req.body.role,
-            buisnessName: req.body.buisnessName,
-            buisnessNumber: req.body.buisnessNumber,
+            businessName: req.body.businessName,
+            businessNumber: req.body.businessNumber,
             location: req.body.location,
             socials: req.body.socials,
             serviceType: req.body.serviceType
