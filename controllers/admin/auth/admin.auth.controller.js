@@ -52,8 +52,8 @@ exports.adminLogin = async(req, res) => {
             status: true,
             msg: 'Admin logged in succesfully',
             data: {
-                fullname: user.fullname,
-                email: user.email,
+                fullname: admin.fullname,
+                email: admin.email,
                 accessJWT
             }
         })
