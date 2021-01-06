@@ -23,11 +23,11 @@ const vendorModel = mongoose.Schema({
         min: 6,
         max: 255
     },
-    buisnessName: {
+    businessName: {
         type: String,
         required: true,
     },
-    buisnessNumber: {
+    businessNumber: {
         type: String,
         required: true,
     },
