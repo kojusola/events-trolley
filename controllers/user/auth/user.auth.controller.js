@@ -60,6 +60,7 @@ exports.userLogin = async(req, res) => {
                     fullname: user.fullname,
                     email: user.email,
                     role: user.role,
+                    serviceType: user.serviceType,
                     accessJWT
                 }
             });
@@ -71,6 +72,7 @@ exports.userLogin = async(req, res) => {
             data: {
                 fullname: user.fullname,
                 email: user.email,
+                role: user.role,
                 accessJWT
             }
         });
