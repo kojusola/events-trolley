@@ -57,9 +57,12 @@ exports.userLogin = async(req, res) => {
             status: true,
             msg: 'User logged in succesfully',
             data: {
+                fullname: user.fullname,
+                email: user.email,
+                role: user.role,
                 accessJWT
             }
-        })
+        });
 
     } catch (error) {
         console.log(error);
