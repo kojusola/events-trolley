@@ -52,12 +52,25 @@ exports.userLogin = async(req, res) => {
         // } else if (userRole == 'vendor') {
         //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,vendorModel)
         // }
-
+        if (user.role == "vendor"){
+           return res.status(200).json({
+                status: true,
+                msg: 'User logged in succesfully',
+                data: {
+                    fullname: user.fullname,
+                    email: user.email,
+                    role: user.role,
+                    accessJWT
+                }
+            });
+            
+        }
         res.status(200).json({
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                user,
+                fullname: user.fullname,
+                email: user.email,
                 accessJWT
             }
         });
