@@ -1,14 +1,15 @@
-const nodemailer = require('nodemailer')
+require('dotenv').config()
+const nodemailer = require('nodemailer');
+const { schema } = require('../models/admin/admin.auth.model');
 
 
 const transporter = nodemailer.createTransport({
-    host: 'smtp.ethereal.email',
-    port: 587,
+    host: 'smtp.gmail.com',
     auth: {
-        user: 'darion78@ethereal.email',
-        pass: 'Azf6ycrJt6dvEMdHG1'
+        user: 'eventstrolleys@gmail.com',
+        pass: process.env.EMAIL_PASS
     }
-});
+})
 
 const send = (info)=>{
     return new Promise( async(resolve, reject)=>{
@@ -29,10 +30,11 @@ const send = (info)=>{
 
 }
 
-const emailProcessor = (email, pin)=>{
-    const info = 
-        {
-            from: '"Event Trolley" fernando.cummings@ethereal.email', // sender address
+const emailProcessor = ({email, pin, type})=>{
+    switch(type){
+        case "request-new-password":
+            var info = {
+            from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
             to: email, // list of receivers
             subject: "Password reset Pin", // Subject line
             text: `Here is your password reset pin ${pin} this pin would expire in one day`, // plain text body
@@ -42,6 +44,37 @@ const emailProcessor = (email, pin)=>{
             <p>This pin would expire in one day</p>`, // html body
           }
           send(info);
+          break;
+        case "password-update-success":
+            var info = {
+            from: '"Event Trolley" fernando.cummings@ethereal.email', // sender address
+            to: email, // list of receivers
+            subject: "Password updated", // Subject line
+            text: `Your new password has been updated`, // plain text body
+            html: `<p><b>Hello</b><p>
+            <p>Your new password has been updated</p>`, // html body
+          }
+          send(info);
+          break;
+        default:
+          break;
+    }
+}
+const getPinByEmailPin = (email,pin,schema)=>{
+    return new Promise ((resolve, reject)=> {
+        try{
+            schema.findOne({email,pin},(error,data)=>{
+                if(error){
+                    console.log(error);
+                    resolve(false);
+                }
+                resolve(data);
+            });
+        } catch (error){
+            reject(error);
+            console.log(error);
+        }
+    })
 }
 
-module.exports = {emailProcessor}
+module.exports = {emailProcessor,getPinByEmailPin}

@@ -15,6 +15,35 @@ const setPasswordResetPin = async (email) => {
         .catch((error)=>reject(error))
     });
 };
+const updatenewpass = (email, newpassword, schema) =>{
+    return new Promise((resolve,reject)=>{
+        try{
+            schema.findOneAndUpdate(
+                {email},
+                {
+                    $set:{"password":newpassword}
+                },
+                { "new": true}
+            ).then((data)=>{resolve(data)})
+            .catch((error)=>reject(error))
+       }catch(error){
+        reject(error)}
+    })
+}
+const deletePin = (email, pin) =>{
+        try{
+            resetPinSchema.findOneAndDelete(
+                {email,resetpin:pin},
+                (error,data)=>{
+                    if(error){
+                        console.log(error)
+                    }
+                });
+       }catch(error){
+           console.log(error)
+       }
+}
 module.exports = {
-    setPasswordResetPin
+    setPasswordResetPin,
+    updatenewpass,deletePin
 }

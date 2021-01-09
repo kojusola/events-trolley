@@ -15,5 +15,19 @@ const registerValidation = (data) => {
     })
     return schema.validate(data);
 }
+const emailValidation =(email)=>{
+    const schema = joi.object({
+        email: joi.string().min(5).required().email()
+    });
+    return schema.validate(email);
+}
+const resetPasswordValidation=(data)=>{
+    const schema = joi.object({
+        email: joi.string().min(5).required().email(),
+        pin:joi.string().min(6).required(),
+        newPassword:joi.string().min(6).required()
+    });
+    return schema.validate(data);
+}
 
-module.exports = { loginValidation, registerValidation };
+module.exports = { loginValidation, registerValidation,resetPasswordValidation,emailValidation };

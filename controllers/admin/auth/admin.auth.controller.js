@@ -2,11 +2,11 @@ require('dotenv').config();
 const adminUserModel = require('../../../models/admin/admin.auth.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const { loginValidation, registerValidation } = require('../../../middlewares/admin/admin.auth.validation');
+const { loginValidation, registerValidation,resetPasswordValidation,emailValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
 const resetPinSchema= require('../../../models/admin/admin.resetpin.model')
-const {setPasswordResetPin}= require('../../functions.controller')
-const {emailProcessor} = require('../../../helper/email.helper')
+const {setPasswordResetPin,updatenewpass,deletePin}= require('../../functions.controller')
+const {emailProcessor,getPinByEmailPin} = require('../../../helper/email.helper')
 
 exports.adminLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -125,6 +125,15 @@ exports.adminRegister = async(req, res) => {
 }
 exports.resetPassword = async (req,res) =>{
     const {email} = req.body;
+    const { error } = emailValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    }
     const adminData = await adminUserModel.findOne({email},(error, data)=>{
         if(error){
             console.log(error);
@@ -139,7 +148,7 @@ exports.resetPassword = async (req,res) =>{
 if(adminData && adminData._id){
     const setPin = await setPasswordResetPin(email)
     if (setPin){
-        await emailProcessor(email, setPin.resetpin)
+    await emailProcessor({email, pin:setPin.resetpin,type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
@@ -154,7 +163,16 @@ if(adminData && adminData._id){
     res.json({status:"error", message:" If email exists in our database, the password reset will be sent shortly"})
 }
 exports.updatePassword = async(req,res)=>{
-    const {email, pin, password } = req.body
+    const { error } = resetPasswordValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    }
+    const {email, pin, newPassword } = req.body
     const getpinData = await resetPinSchema.findOne({email,resetpin:pin},(error, data)=>{
         if(error){
             console.log(error);
@@ -166,5 +184,36 @@ exports.updatePassword = async(req,res)=>{
         })
     }
 });
-    return res.json(getpinData)
+try{
+    if(getpinData._id){
+        const dbDate = getpinData.createdAt;
+        const expiresIn = 1;
+
+        let expDate = dbDate.setDate(dbDate.getDate()+ expiresIn);
+        const today = new Date();
+        if (today > expDate){
+            return res.json({
+                status:"error",
+                message:"Invalid or expired pin."
+            })
+        }
+        const salt = await bcrypt.genSalt(10);
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+        const user  = await updatenewpass (email,hashedNewPassword,adminUserModel);
+        if(user._id){
+            await emailProcessor({email,type:"password-update-success"})
+        //delete pin from db
+            await deletePin(email, pin)
+            res.json({status:"success", message:"Your password has been up dated"})
+        }
+    }
+}catch(error){
+    console.log(error);
+    res.json({status:"error", message:"unable to update your password. pleasee try again later"})
 }
+}
+// exports.updatePassword = async (req,res) =>{
+//     const {email,pin,newPassword} =req.body;
+
+//     const getPin = await getPinByEmailPin(email,pin,resetPinSchema);
+// }
