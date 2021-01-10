@@ -30,18 +30,17 @@ const send = (info)=>{
 
 }
 
-const emailProcessor = ({email, pin, type})=>{
+const emailProcessor = ({email, id, name, type})=>{
     switch(type){
         case "request-new-password":
             var info = {
             from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
             to: email, // list of receivers
-            subject: "Password reset Pin", // Subject line
-            text: `Here is your password reset pin ${pin} this pin would expire in one day`, // plain text body
-            html: `<p><b>Hello</b><p>
-            here is your pin 
-            <b>${pin}<b>
-            <p>This pin would expire in one day</p>`, // html body
+            subject: "Password reset", // Subject line
+            text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/reset/${id}`, // plain text body
+            html: `<p><b>Hello ${name},</b><p>
+            To reset your password, please click on this link: https://events-trolley.herokuapp.com/reset/${id}
+            <p>This link would expire in one hour</p>`, // html body
           }
           send(info);
           break;
@@ -50,8 +49,8 @@ const emailProcessor = ({email, pin, type})=>{
             from: '"Event Trolley" fernando.cummings@ethereal.email', // sender address
             to: email, // list of receivers
             subject: "Password updated", // Subject line
-            text: `Your new password has been updated`, // plain text body
-            html: `<p><b>Hello</b><p>
+            text: ` Hello ${name},Your new password has been updated`, // plain text body
+            html: `<p><b>Hello ${name},</b><p>
             <p>Your new password has been updated</p>`, // html body
           }
           send(info);

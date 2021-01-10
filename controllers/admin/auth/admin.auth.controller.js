@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const { loginValidation, registerValidation,resetPasswordValidation,emailValidation } = require('../../../middlewares/admin/admin.auth.validation');
 const { createAccessJWT, createRefreshJWT,storeUserRefreshJWT } = require('../../../createVerifytoken')
 const resetPinSchema= require('../../../models/admin/admin.resetpin.model')
-const {setPasswordResetPin,updatenewpass,deletePin}= require('../../functions.controller')
+const {setPasswordResetId,updatenewpass,deleteId}= require('../../functions.controller')
 const {emailProcessor,getPinByEmailPin} = require('../../../helper/email.helper')
 
 exports.adminLogin = async(req, res) => {
@@ -146,9 +146,10 @@ exports.resetPassword = async (req,res) =>{
     }
 });
 if(adminData && adminData._id){
-    const setPin = await setPasswordResetPin(email)
-    if (setPin){
-    await emailProcessor({email, pin:setPin.resetpin,type:"request-new-password"})
+    const nameList = adminData.fullname.split(" ")
+    const setId = await setPasswordResetId(email)
+    if (setId){
+    await emailProcessor({email, id:setId.id,name:nameList[0],type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
@@ -172,8 +173,8 @@ exports.updatePassword = async(req,res)=>{
             statusCode: 400
         });
     }
-    const {email, pin, newPassword } = req.body
-    const getpinData = await resetPinSchema.findOne({email,resetpin:pin},(error, data)=>{
+    const {id, newPassword } = req.body
+    const getIdData = await resetPinSchema.findOne({id},(error, data)=>{
         if(error){
             console.log(error);
             res.status(500).send({
@@ -185,25 +186,28 @@ exports.updatePassword = async(req,res)=>{
     }
 });
 try{
-    if(getpinData._id){
-        const dbDate = getpinData.createdAt;
+    if(getIdData._id){
+        const dbDate = getIdData.createdAt;
+        console.log(dbDate)
         const expiresIn = 1;
 
         let expDate = dbDate.setDate(dbDate.getDate()+ expiresIn);
+        console.log(expDate);
         const today = new Date();
         if (today > expDate){
             return res.json({
                 status:"error",
-                message:"Invalid or expired pin."
+                message:"Invalid or expired link."
             })
         }
         const salt = await bcrypt.genSalt(10);
         const hashedNewPassword = await bcrypt.hash(newPassword, salt);
-        const user  = await updatenewpass (email,hashedNewPassword,adminUserModel);
+        const user  = await updatenewpass (getIdData.email,hashedNewPassword,adminUserModel);
         if(user._id){
-            await emailProcessor({email,type:"password-update-success"})
+            const nameList = user.fullname.split(" ")
+            await emailProcessor({email:user.email, name: nameList[0],type:"password-update-success"})
         //delete pin from db
-            await deletePin(email, pin)
+            await deleteId(user.email, id)
             res.json({status:"success", message:"Your password has been up dated"})
         }
     }

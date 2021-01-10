@@ -46,10 +46,8 @@ const emailValidation =(email)=>{
 }
 const resetPasswordValidation=(data)=>{
     const schema = joi.object({
-        email: joi.string().min(5).required().email(),
-        pin:joi.string().min(6).required(),
-        newPassword:joi.string().min(6).required(),
-        role: joi.string().min(3).required()
+        id:joi.string().min(6).required(),
+        newPassword:joi.string().min(6).required()
     });
     return schema.validate(data);
 }

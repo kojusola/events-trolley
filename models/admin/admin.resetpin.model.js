@@ -8,11 +8,12 @@ resetPinSchema = mongoose.Schema({
         min: 3,
         max: 255
     },
-    resetpin: {
+    id: {
         type: String,
         required: true,
-        min: 6,
-        max: 6
+    },
+    role:{
+        type:String
     }
 },{timestamps: true})
 

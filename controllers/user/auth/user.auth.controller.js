@@ -7,7 +7,7 @@ const { loginValidation, customerRegisterValidation, vendorRegisterValidation ,
     emailValidation, resetPasswordValidation} = require('../../../middlewares/user/user.auth.validation');
 const { createAccessJWT } = require('../../../createVerifytoken');
 const resetPinSchema = require('../../../models/admin/admin.resetpin.model')
-const { setPasswordResetPin,updatenewpass,deletePin} = require('../../functions.controller');
+const { setPasswordResetIdUsers,updatenewpass,deleteId} = require('../../functions.controller');
 const{emailProcessor,getPinByEmailPin} = require('../../../helper/email.helper')
 
 exports.userLogin = async(req, res) => {
@@ -273,9 +273,10 @@ exports.resetPassword = async (req,res) =>{
     }
 });
 if(userData && userData._id){
-    const setPin = await setPasswordResetPin(email)
-    if (setPin){
-    await emailProcessor({email, pin:setPin.resetpin,type:"request-new-password"})
+    const nameList = userData.fullname.split(" ")
+    const setId = await setPasswordResetIdUsers(email,role)
+    if (setId){
+    await emailProcessor({email, id:setId.id,name:nameList[0],type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
@@ -300,9 +301,10 @@ if(userData && userData._id){
     }
 });
 if(userData && userData._id){
-    const setPin = await setPasswordResetPin(email)
-    if (setPin){
-    await emailProcessor({email, pin:setPin.resetpin,type:"request-new-password"})
+    const nameList = userData.fullname.split(" ")
+    const setId = await setPasswordResetIdUsers(email,role)
+    if (setId){
+    await emailProcessor({email, email, id:setId.id,name:nameList[0],type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
@@ -327,8 +329,8 @@ exports.updatePassword = async(req,res)=>{
             statusCode: 400
         });
     }
-    const {email, pin, newPassword,role } = req.body
-    const getpinData = await resetPinSchema.findOne({email,resetpin:pin},(error, data)=>{
+    const {newPassword, id } = req.body
+    const getIdData = await resetPinSchema.findOne({id},(error, data)=>{
         if(error){
             console.log(error);
             res.status(500).send({
@@ -340,9 +342,9 @@ exports.updatePassword = async(req,res)=>{
     }
 });
 try{
-    if(getpinData._id){
-        const dbDate = getpinData.createdAt;
-        const expiresIn = 1;
+    if(getIdData._id){
+        const dbDate = getIdData.createdAt;
+        const expiresIn =1;
 
         let expDate = dbDate.setDate(dbDate.getDate()+ expiresIn);
         const today = new Date();
@@ -354,20 +356,23 @@ try{
         }
         const salt = await bcrypt.genSalt(10);
         const hashedNewPassword = await bcrypt.hash(newPassword, salt);
-        if (role == 'vendor'){
-        const user  = await updatenewpass (email,hashedNewPassword,vendorModel);
+        console.log(getIdData.role)
+        if (getIdData.role== 'vendor'){
+        const user  = await updatenewpass (getIdData.email,hashedNewPassword,vendorModel);
+        const nameList = user.fullname.split(" ")
         if(user._id){
-            await emailProcessor({email,type:"password-update-success"})
+            await emailProcessor({email:user.email, name:nameList[0],type:"password-update-success"})
         //delete pin from db
-            await deletePin(email, pin)
+            await deleteId(user.email, id)
             res.json({status:"success", message:"Your password has been up dated"})
         }
         }else{
-        const user  = await updatenewpass (email,hashedNewPassword,customerModel);
+        const user  = await updatenewpass (getIdData.email,hashedNewPassword,customerModel);
+        const nameList = user.fullname.split(" ")
         if(user._id){
-            await emailProcessor({email,type:"password-update-success"})
+            await emailProcessor({email:user.email,name:nameList[0],type:"password-update-success"})
         //delete pin from db
-            await deletePin(email, pin)
+            await deleteId(user.email, id)
             res.json({status:"success", message:"Your password has been up dated"})
         }
         }
