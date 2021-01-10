@@ -205,7 +205,7 @@ try{
         const user  = await updatenewpass (getIdData.email,hashedNewPassword,adminUserModel);
         if(user._id){
             const nameList = user.fullname.split(" ")
-            await emailProcessor({email:user.email, name: nameList[0],type:"password-update-success"})
+            await emailProcessor({email:user.email, name: nameList[0],user: "admin",type:"password-update-success"})
         //delete pin from db
             await deleteId(user.email, id)
             res.json({status:"success", message:"Your password has been up dated"})

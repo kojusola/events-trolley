@@ -30,20 +30,34 @@ const send = (info)=>{
 
 }
 
-const emailProcessor = ({email, id, name, type})=>{
+const emailProcessor = ({email, id, name,user, type})=>{
     switch(type){
         case "request-new-password":
-            var info = {
-            from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
-            to: email, // list of receivers
-            subject: "Password reset", // Subject line
-            text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/reset/${id}`, // plain text body
-            html: `<p><b>Hello ${name},</b><p>
-            To reset your password, please click on this link: https://events-trolley.herokuapp.com/reset/${id}
-            <p>This link would expire in one hour</p>`, // html body
-          }
-          send(info);
-          break;
+            if(user="admin"){
+                var info = {
+                    from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
+                    to: email, // list of receivers
+                    subject: "Password reset", // Subject line
+                    text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/admin/reset-password/${id}`, // plain text body
+                    html: `<p><b>Hello ${name},</b><p>
+                    To reset your password, please click on this link: https://events-trolley.herokuapp.com/admin/reset-password/${id}
+                    <p>This link would expire in one hour</p>`, // html body
+                  }
+                  send(info);
+                  break;
+            }else{
+                var info = {
+                    from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
+                    to: email, // list of receivers
+                    subject: "Password reset", // Subject line
+                    text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/auth/reset-password/${id}`, // plain text body
+                    html: `<p><b>Hello ${name},</b><p>
+                    To reset your password, please click on this link: https://events-trolley.herokuapp.com/auth/reset-password/${id}
+                    <p>This link would expire in one hour</p>`, // html body
+                  }
+                  send(info);
+                  break;
+            }
         case "password-update-success":
             var info = {
             from: '"Event Trolley" fernando.cummings@ethereal.email', // sender address

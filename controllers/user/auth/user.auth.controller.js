@@ -276,7 +276,7 @@ if(userData && userData._id){
     const nameList = userData.fullname.split(" ")
     const setId = await setPasswordResetIdUsers(email,role)
     if (setId){
-    await emailProcessor({email, id:setId.id,name:nameList[0],type:"request-new-password"})
+    await emailProcessor({email, id:setId.id,name:nameList[0],user: "users",type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
@@ -304,7 +304,7 @@ if(userData && userData._id){
     const nameList = userData.fullname.split(" ")
     const setId = await setPasswordResetIdUsers(email,role)
     if (setId){
-    await emailProcessor({email, email, id:setId.id,name:nameList[0],type:"request-new-password"})
+    await emailProcessor({email, email, id:setId.id,name:nameList[0],user: "users",type:"request-new-password"})
         return res.json({
             status : "success",
             message:"If email exists in our database, the password reset will be sent shortly"
