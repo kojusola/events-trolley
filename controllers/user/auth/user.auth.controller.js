@@ -372,7 +372,7 @@ try{
             await emailProcessor({email:user.email, name:nameList[0],type:"password-update-success"})
         //delete pin from db
             await deleteId(user.email, id)
-            res.json({status:"success", message:"Your password has been updated"})
+            res.json({status:"success", msg:"Your password has been updated"})
         }
         }else{
         const user  = await updatenewpass (getIdData.email,hashedNewPassword,customerModel);
@@ -381,7 +381,7 @@ try{
             await emailProcessor({email:user.email,name:nameList[0],type:"password-update-success"})
         //delete pin from db
             await deleteId(user.email, id)
-            res.json({status:"success", message:"Your password has been up dated"})
+            res.json({status:"success", msg:"Your password has been up dated"})
         }
         }
     }

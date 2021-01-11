@@ -158,7 +158,7 @@ if(adminData && adminData._id){
     }else{
     return res.status(400).json({
         status : false,
-        message: "unable to send email at the moment, please try again later",
+        msg: "unable to send email at the moment, please try again later",
         statusCode:400
     });
 }
@@ -195,7 +195,7 @@ try{
     if(getIdData._id){
         const dbDate = getIdData.createdAt;
         console.log(dbDate)
-        const expiresIn = 1;
+        const expiresIn = 1*60*60*1000;
 
         let expDate = dbDate.setDate(dbDate.getDate()+ expiresIn);
         console.log(expDate);
@@ -203,7 +203,7 @@ try{
         if (today > expDate){
             return res.json({
                 status:"error",
-                message:"Invalid or expired link."
+                msg:"Invalid or expired link."
             })
         }
         const salt = await bcrypt.genSalt(10);
@@ -214,12 +214,12 @@ try{
             await emailProcessor({email:user.email, name: nameList[0],user: "admin",type:"password-update-success"})
         //delete pin from db
             await deleteId(user.email, id)
-            res.json({status:"success", message:"Your password has been up dated"})
+            res.json({status:"success", msg:"Your password has been up dated"})
         }
     }
 }catch(error){
     console.log(error);
-    res.json({status:"error", message:"unable to update your password. Please try again later"})
+    res.json({status:"error", msg:"unable to update your password. Please try again later"})
 }
 }
 // exports.updatePassword = async (req,res) =>{
