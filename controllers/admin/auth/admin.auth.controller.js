@@ -150,18 +150,24 @@ if(adminData && adminData._id){
     const setId = await setPasswordResetId(email)
     if (setId){
     await emailProcessor({email, id:setId.id,name:nameList[0],type:"request-new-password"})
-        return res.json({
-            status : "success",
-            message:"If email exists in our database, the password reset will be sent shortly"
-        });
+        return res.status(200).json({
+                status: true,
+                msg: "Email sent,Check your email.",
+                statusCode: 200
+            });
     }else{
-    return res.json({
-        status : "success",
-        message: "unable to send email at the moment, please try again later"
+    return res.status(400).json({
+        status : false,
+        message: "unable to send email at the moment, please try again later",
+        statusCode:400
     });
 }
 }
-    res.json({status:"error", message:" If email exists in our database, the password reset will be sent shortly"})
+    res.status(401).json({
+    status: false,
+    msg: 'This email does not exist',
+    statusCode: 401
+    });
 }
 exports.updatePassword = async(req,res)=>{
     const { error } = resetPasswordValidation(req.body);
@@ -213,7 +219,7 @@ try{
     }
 }catch(error){
     console.log(error);
-    res.json({status:"error", message:"unable to update your password. pleasee try again later"})
+    res.json({status:"error", message:"unable to update your password. Please try again later"})
 }
 }
 // exports.updatePassword = async (req,res) =>{
