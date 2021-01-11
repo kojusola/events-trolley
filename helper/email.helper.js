@@ -33,14 +33,14 @@ const send = (info)=>{
 const emailProcessor = ({email, id, name,user, type})=>{
     switch(type){
         case "request-new-password":
-            if(user="admin"){
+            if(user=="admin"){
                 var info = {
                     from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
                     to: email, // list of receivers
                     subject: "Password reset", // Subject line
-                    text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/admin/reset-password/${id}`, // plain text body
+                    text: `Hello ${name},To reset your password, please click on this link: https://eventstrolleyfrontend.netlify.app/reset-password?role=${user}&authId=${id}`, // plain text body
                     html: `<p><b>Hello ${name},</b><p>
-                    To reset your password, please click on this link: https://events-trolley.herokuapp.com/admin/reset-password/${id}
+                    To reset your password, please click on this link: https://eventstrolleyfrontend.netlify.app/reset-password?role=${user}&authId=${id}
                     <p>This link would expire in one hour</p>`, // html body
                   }
                   send(info);
@@ -50,9 +50,9 @@ const emailProcessor = ({email, id, name,user, type})=>{
                     from: '"Event Trolley" eventstrolleys@gmail.com', // sender address
                     to: email, // list of receivers
                     subject: "Password reset", // Subject line
-                    text: `Hello ${name},To reset your password, please click on this link: https://events-trolley.herokuapp.com/auth/reset-password/${id}`, // plain text body
+                    text: `Hello ${name},To reset your password, please click on this link: https://eventstrolleyfrontend.netlify.app/reset-password?role=${user}&authId=${id}`, // plain text body
                     html: `<p><b>Hello ${name},</b><p>
-                    To reset your password, please click on this link: https://events-trolley.herokuapp.com/auth/reset-password/${id}
+                    To reset your password, please click on this link: https://eventstrolleyfrontend.netlify.app/reset-password?role=${user}&authId=${id}
                     <p>This link would expire in one hour</p>`, // html body
                   }
                   send(info);

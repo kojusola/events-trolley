@@ -149,7 +149,7 @@ if(adminData && adminData._id){
     const nameList = adminData.fullname.split(" ")
     const setId = await setPasswordResetId(email)
     if (setId){
-    await emailProcessor({email, id:setId.id,name:nameList[0],type:"request-new-password"})
+    await emailProcessor({email, id:setId.id, user:"admin", name:nameList[0],type:"request-new-password"})
         return res.status(200).json({
                 status: true,
                 msg: "Email sent,Check your email.",
