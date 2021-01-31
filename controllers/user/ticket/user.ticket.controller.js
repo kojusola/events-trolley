@@ -21,8 +21,8 @@ exports.createNewTicket= async(req, res) => {
         const opts = {session,new:true};
         console.log(req.query.id)
         const ticket = new ticketModel({
-            vendor_id: req.userId,
-            event_name: req.body.event_name,
+            vendorId: req.userId,
+            eventName: req.body.event_name,
             eventVenue: req.body.eventVenue,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
@@ -38,8 +38,8 @@ exports.createNewTicket= async(req, res) => {
                 status: true,
                 msg: 'Ticket successfully created',
                 data: {
-                    vendor
-                },
+                vendor
+            },
                 statusCode: 200
             })
         }else{
@@ -153,36 +153,37 @@ exports.getVerifiedTickets= async(req, res) => {
 }
 
 exports.deleteTicket= async(req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // const session = await mongoose.startSession();
+    // session.startTransaction();
     try{
-        const opts = {session};
-        const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id},opts);
-        const ticketVend = await vendorModel.findOneAndDelete({"ticket._id":req.query.ticket_id},opts);
-        await session.commitTransaction();
-        session.endSession();
-        if(ticket){
+        // const opts = {session};
+        // const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id},opts);
+        console.log(req.userId)
+        const ticketVend = await vendorModel.findByIdAndUpdate({"_id":req.userId},{"$pop":{"ticket":{"_id":req.query.ticket_id}}},{ safe:true,new:true});
+        // await session.commitTransaction();
+        // session.endSession();
+        if(ticketVend){
             res.status(200).json({
                 status: true,
                 msg: 'Ticket successfully deleted.',
                 data: {
-                    ticket
+                    ticketVend 
                 },
                 statusCode: 200
-            })
+            });
         }else{
             res.status(200).json({
                 status: true,
                 msg: 'Ticket not deleted.',
                 data: {
-                    ticket,ticketVend
+                    ticketVend
                 },
                 statusCode: 200
             })
         }
     }catch(error){
-        await session.abortTransaction();
-        session.endSession()
+        // await session.abortTransaction();
+        // session.endSession()
         console.log(error);
         res.status(500).send({
             status: false,

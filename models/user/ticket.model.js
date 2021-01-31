@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ticketModel = mongoose.Schema({
     vendor_id : String,
-    event_name:{
+    eventName:{
         type: String,
         required: true,
         min: 3,
@@ -20,10 +20,10 @@ const ticketModel = mongoose.Schema({
         type:Date
     },
     categories:[{
-        ticketname: String,
+        ticketName: String,
         Description: String,
-        numoftickets: Number,
-        price:Number
+        numberOfTickets: Number,
+        price:String
     }],
     verified:{
         type: Boolean,

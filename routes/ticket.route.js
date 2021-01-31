@@ -6,7 +6,7 @@ const { verifyToken,restrictTo } = require('../middlewares/authorization.middlew
 // router.get('/',ticketController.getAllTickets;)
 router.post('/',verifyToken,restrictTo("vendor"), ticketController.createNewTicket);
 router.get('/', verifyToken,ticketController.getOneTicket);
-router.get('/delete',ticketController.deleteTicket);
+router.get('/delete',verifyToken,ticketController.deleteTicket);
 router.patch('/update',verifyToken,restrictTo("vendor"), ticketController.updateTicket);
 
 module.exports = router;
