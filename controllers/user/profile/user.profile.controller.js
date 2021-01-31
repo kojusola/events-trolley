@@ -2,7 +2,7 @@ const customerModel = require('../../../models/user/customer.auth.model');
 const vendorModel = require('../../../models/user/vendor.auth.model');
 
 exports.userProfile = async(req, res) => {
-    const _id = req.query.userId
+    const _id = req.userId
     if(!_id) return false;
    var existAsProfile = await customerModel.exists({_id}, async (error, data)=>{
        if(error){
