@@ -21,7 +21,7 @@ exports.createNewTicket= async(req, res) => {
         const opts = {session,new:true};
         console.log(req.query.id)
         const ticket = new ticketModel({
-            vendor_id: req.query.id,
+            vendor_id: req.userId,
             event_name: req.body.event_name,
             eventVenue: req.body.eventVenue,
             startDate: req.body.startDate,
