@@ -6,6 +6,7 @@ const { verifyToken } = require('../middlewares/authorization.middleware');
 // router.get('/',ticketController.getAllTickets;)
 router.post('/:id', ticketController.createNewTicket);
 router.get('/:ticket_id', ticketController.getOneTicket);
-router.get('/remove/:ticket_id', ticketController.deleteTicket);
+router.get('/delete/:ticket_id', ticketController.deleteTicket);
+router.post('/update/:ticket_id', ticketController.updateTicket);
 
 module.exports = router;

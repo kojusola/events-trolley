@@ -191,3 +191,35 @@ exports.deleteTicket= async(req, res) => {
         });
     }
 }
+
+exports.updateTicket= async(req, res) => {
+    try{
+        const update = req.body
+        const ticket = await ticketModel.findOneAndUpdate({"_id":req.params.ticket_id},update,{new:true});
+        const vendor = await vendorModel.findOneAndUpdate({"ticket._id":req.params.ticket_id},update,{new:true});
+        if(ticket){
+            res.status(200).json({
+                status: true,
+                msg: 'Ticket updated.',
+                data: {
+                    ticket
+                },
+                statusCode: 200
+            })
+        }else{
+            res.status(400).json({
+                status: true,
+                msg: 'Ticket not updated.',
+                statusCode: 200
+            })
+        }
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
+}
