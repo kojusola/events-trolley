@@ -25,9 +25,9 @@ exports.userLogin = async(req, res) => {
         const userRole = req.body.role;
         let user = null;
         if (userRole == 'customer') {
-            user = await customerModel.findOne({ email: req.body.email })
+            user = await customerModel.findOne({ email: req.body.email }).select('password')
         } else if (userRole == 'vendor') {
-            user = await vendorModel.findOne({ email: req.body.email })
+            user = await vendorModel.findOne({ email: req.body.email }).select('password')
         }
         const oopsMessage = 'Oops, Your email or password is incorrect'
         if (!user) {

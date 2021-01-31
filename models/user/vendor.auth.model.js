@@ -21,7 +21,8 @@ const vendorModel = mongoose.Schema({
         type: String,
         required: true,
         min: 6,
-        max: 255
+        max: 255,
+        select: false
     },
     businessName: {
         type: String,
@@ -51,6 +52,7 @@ const vendorModel = mongoose.Schema({
         type: String,
         required: true,
     },
+    ticket:[],
     refreshJWT:{
         type:Object,
         token:{

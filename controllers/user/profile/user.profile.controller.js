@@ -26,7 +26,7 @@ exports.userProfile = async(req, res) => {
              });
          }
      });
-     res.json({success:"hello",user:customerProfile});
+     res.json({success: true,user:customerProfile});
  }
          if(!data){
              const vendorProfile = await vendorModel.findOne({_id},(error, data)=>{
