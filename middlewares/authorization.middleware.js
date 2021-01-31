@@ -25,11 +25,10 @@ const { verifyAccessToken } = require('../createVerifytoken');
     return res.status(403).json({msg:"Forbidden"})
      
 }
-const restrictTo = (...roles) => {
+const restrictTo = (role) => {
     return (req, res, next) => {
-        if(!roles.includes(req.userId)){
-            req.flash("error", "Unauthorised!")
-            return res.redirect('/auth/login')
+        if(!role.includes(req.userRole)){
+            return res.status(403).json({msg:"Unauthorized"})
         }
         next()
     }
