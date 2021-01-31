@@ -49,7 +49,8 @@ exports.userLogin = async(req, res) => {
             })
         }
         //assign assess and refresh tokens
-        const accessJWT = await createAccessJWT(user.email, user.id)
+        const accessJWT = await createAccessJWT(userRole, user.id)
+        console.log(userRole,user.id)
         //const refreshJWT = await createRefreshJWT(user.email)
         // if (userRole == 'customer') {
         //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,customerModel)

@@ -5,9 +5,10 @@ const adminUserModel = require('./models/admin/admin.auth.model');
 const { findOneAndUpdate } = require('./models/admin/admin.auth.model');
 const { date } = require('@hapi/joi');
 
-const createAccessJWT = async (email, users) =>{
+const createAccessJWT = async (role, users) =>{
     try{
-        const accessJWT = await jwt.sign({ email, users }, process.env.ACCESS_TOKEN_SECRET,{expiresIn:"60m"});
+        console.log(role,users);
+        const accessJWT = await jwt.sign({ role,users }, process.env.ACCESS_TOKEN_SECRET,{expiresIn:"60m"});
         //await setJWT(accessJWT, users)
         return Promise.resolve (accessJWT);
 

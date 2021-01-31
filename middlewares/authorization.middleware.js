@@ -17,13 +17,25 @@ const { verifyAccessToken } = require('../createVerifytoken');
     // deleteJWT( authorization )
     if(decoded.users){
         const userId = await decoded.users
+        const userRole = await decoded.role
+        req.userRole = await userRole
         req.userId = await userId
         return  next();
      }
     return res.status(403).json({msg:"Forbidden"})
      
 }
+const restrictTo = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.userId)){
+            req.flash("error", "Unauthorised!")
+            return res.redirect('/auth/login')
+        }
+        next()
+    }
+}
 
 module.exports={
-    verifyToken
+    verifyToken,
+    restrictTo
 }
