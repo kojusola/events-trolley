@@ -5,6 +5,7 @@ const { verifyAccessToken } = require('../createVerifytoken');
  const verifyToken = async function (req,res,next){
      const { authorization } = req.headers;
     const decoded = await verifyAccessToken(authorization);
+    console.log(decoded)
     // if(decoded.email){
     //     const userId = await getJWT(authorization)
     //     if(!userId){
@@ -14,12 +15,13 @@ const { verifyAccessToken } = require('../createVerifytoken');
     //      return  next();
     // }
     // deleteJWT( authorization )
-    if(decoded.email){
-    const userId = await decoded.users
-    req.userId = await userId
-    return  next();
+    if(decoded.users){
+        const userId = await decoded.users
+        req.userId = await userId
+        return  next();
      }
-return res.status(403).json({message:"Forbidden"})
+    return res.status(403).json({msg:"Forbidden"})
+     
 }
 
 module.exports={

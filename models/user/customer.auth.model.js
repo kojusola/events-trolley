@@ -25,7 +25,8 @@ const customerModel = mongoose.Schema({
         type: String,
         required: true,
         min: 10,
-        max: 255
+        max: 255,
+        select:false
     },
     role: {
         type: String,
