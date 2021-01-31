@@ -30,7 +30,7 @@ exports.createNewTicket= async(req, res) => {
             verified: req.body.verified,
         });
         await ticket.save(opts);
-        const vendor = await vendorModel.findOneAndUpdate({"_id":ticket.vendor_id},{$push :{ticket:ticket}},opts);
+        const vendor = await (await vendorModel.findOneAndUpdate({"_id":ticket.vendor_id},{$push :{ticket:ticket}},opts));
         await session.commitTransaction();
         session.endSession();
         if(vendor){

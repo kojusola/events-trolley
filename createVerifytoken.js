@@ -7,7 +7,6 @@ const { date } = require('@hapi/joi');
 
 const createAccessJWT = async (role, users) =>{
     try{
-        console.log(role,users);
         const accessJWT = await jwt.sign({ role,users }, process.env.ACCESS_TOKEN_SECRET,{expiresIn:"60m"});
         //await setJWT(accessJWT, users)
         return Promise.resolve (accessJWT);

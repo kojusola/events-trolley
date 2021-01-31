@@ -25,9 +25,11 @@ exports.userLogin = async(req, res) => {
         const userRole = req.body.role;
         let user = null;
         if (userRole == 'customer') {
-            user = await customerModel.findOne({ email: req.body.email }).select('password')
+            user = await customerModel.findOne({ email: req.body.email })
+            user1 = await customerModel.findOne({ email: req.body.email }).select('password')
         } else if (userRole == 'vendor') {
-            user = await vendorModel.findOne({ email: req.body.email }).select('password')
+            user = await vendorModel.findOne({ email: req.body.email })
+            user1 = await vendorModel.findOne({ email: req.body.email }).select('password')
         }
         const oopsMessage = 'Oops, Your email or password is incorrect'
         if (!user) {
@@ -39,7 +41,7 @@ exports.userLogin = async(req, res) => {
             })
         }
         // check if password is correct
-        const validatePassword = await bcrypt.compare(req.body.password, user.password);
+        const validatePassword = await bcrypt.compare(req.body.password, user1.password);
         if (!validatePassword) {
             return res.status(401).json({
                 status: false,
@@ -50,7 +52,6 @@ exports.userLogin = async(req, res) => {
         }
         //assign assess and refresh tokens
         const accessJWT = await createAccessJWT(userRole, user.id)
-        console.log(userRole,user.id)
         //const refreshJWT = await createRefreshJWT(user.email)
         // if (userRole == 'customer') {
         //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,customerModel)
@@ -75,9 +76,9 @@ exports.userLogin = async(req, res) => {
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                fullname: user.fullname,
-                email: user.email,
-                role: user.role,
+                "fullname": user.fullname,
+                "email": `${user.email}`,
+                "role": `${user.role}`,
                 accessJWT
             }
         });

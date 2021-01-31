@@ -5,7 +5,6 @@ const { verifyAccessToken } = require('../createVerifytoken');
  const verifyToken = async function (req,res,next){
      const { authorization } = req.headers;
     const decoded = await verifyAccessToken(authorization);
-    console.log(decoded)
     // if(decoded.email){
     //     const userId = await getJWT(authorization)
     //     if(!userId){
