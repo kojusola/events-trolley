@@ -19,8 +19,9 @@ exports.createNewTicket= async(req, res) => {
     session.startTransaction();
     try{
         const opts = {session,new:true};
+        console.log(req.query.id)
         const ticket = new ticketModel({
-            vendor_id: req.params.id,
+            vendor_id: req.query.id,
             event_name: req.body.event_name,
             eventVenue: req.body.eventVenue,
             startDate: req.body.startDate,
@@ -63,7 +64,7 @@ exports.createNewTicket= async(req, res) => {
 
 exports.getOneTicket= async(req, res) => {
     try{
-        const ticket = await ticketModel.findOne({"_id":req.params.ticket_id});
+        const ticket = await ticketModel.findOne({"_id":req.query.ticket_id});
         if(ticket){
             res.status(200).json({
                 status: true,
@@ -156,8 +157,8 @@ exports.deleteTicket= async(req, res) => {
     session.startTransaction();
     try{
         const opts = {session};
-        const ticket = await ticketModel.findOneAndDelete({"_id":req.params.ticket_id},opts);
-        const ticketVend = await vendorModel.findOneAndDelete({"ticket._id":req.params.ticket_id},opts);
+        const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id},opts);
+        const ticketVend = await vendorModel.findOneAndDelete({"ticket._id":req.query.ticket_id},opts);
         await session.commitTransaction();
         session.endSession();
         if(ticket){
@@ -195,8 +196,8 @@ exports.deleteTicket= async(req, res) => {
 exports.updateTicket= async(req, res) => {
     try{
         const update = req.body
-        const ticket = await ticketModel.findOneAndUpdate({"_id":req.params.ticket_id},update,{new:true});
-        const vendor = await vendorModel.findOneAndUpdate({"ticket._id":req.params.ticket_id},update,{new:true});
+        const ticket = await ticketModel.findOneAndUpdate({"_id":req.query.ticket_id},update,{new:true});
+        const vendor = await vendorModel.findOneAndUpdate({"ticket._id":req.query.ticket_id},update,{new:true});
         if(ticket){
             res.status(200).json({
                 status: true,
