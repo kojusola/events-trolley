@@ -28,6 +28,7 @@ const ticketModel = mongoose.Schema({
     endDate:{
         type:Date
     },
+    category:String,
     categories:[{
         ticketName: String,
         description: String,

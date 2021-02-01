@@ -27,6 +27,7 @@ exports.createNewTicket= async(req, res) => {
             eventVenue: req.body.eventVenue,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
+            category:req.body.category,
             categories: req.body.categories,
             verified: req.body.verified,
         });
