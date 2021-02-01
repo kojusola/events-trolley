@@ -63,7 +63,7 @@ exports.userLogin = async(req, res) => {
                 status: true,
                 msg: 'User logged in succesfully',
                 data: {
-                    accessJWT
+                    token:accessJWT
                 }
             });
             
@@ -72,7 +72,7 @@ exports.userLogin = async(req, res) => {
             status: true,
             msg: 'User logged in succesfully',
             data: {
-                accessJWT
+                token:accessJWT
             }
         });
 
