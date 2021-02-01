@@ -63,6 +63,7 @@ exports.userLogin = async(req, res) => {
                 status: true,
                 msg: 'User logged in succesfully',
                 data: {
+                    role:user.role,
                     token:accessJWT
                 }
             });
@@ -72,6 +73,7 @@ exports.userLogin = async(req, res) => {
             status: true,
             msg: 'User logged in succesfully',
             data: {
+                role:user.role,
                 token:accessJWT
             }
         });
