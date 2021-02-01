@@ -1,7 +1,16 @@
 const mongoose = require('mongoose');
 
 const ticketModel = mongoose.Schema({
-    vendor_id : String,
+    vendorId : String,
+    ticketImage :{
+        type: Object,
+        "avatar":{
+            type:String
+        },
+        "cloundinaryId":{
+            type:String
+        }
+    },
     eventName:{
         type: String,
         required: true,
@@ -21,7 +30,7 @@ const ticketModel = mongoose.Schema({
     },
     categories:[{
         ticketName: String,
-        Description: String,
+        description: String,
         numberOfTickets: Number,
         price:String
     }],

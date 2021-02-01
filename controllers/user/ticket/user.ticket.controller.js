@@ -3,6 +3,8 @@ const {newTicketValidation} = require('../../../middlewares/user/user.ticket.val
 const ticketModel = require('../../../models/user/ticket.model');
 const mongoose = require('mongoose');
 const userAuthValidation = require('../../../middlewares/user/user.auth.validation');
+const upload = require("../../../helper/multer");
+const cloudinary = require("../../../helper/cloudinary");
 
 
 exports.createNewTicket= async(req, res) => {
@@ -19,10 +21,9 @@ exports.createNewTicket= async(req, res) => {
     session.startTransaction();
     try{
         const opts = {session,new:true};
-        console.log(req.query.id)
         const ticket = new ticketModel({
             vendorId: req.userId,
-            eventName: req.body.event_name,
+            eventName: req.body.eventName,
             eventVenue: req.body.eventVenue,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
@@ -30,7 +31,7 @@ exports.createNewTicket= async(req, res) => {
             verified: req.body.verified,
         });
         await ticket.save(opts);
-        const vendor = await (await vendorModel.findOneAndUpdate({"_id":ticket.vendor_id},{$push :{ticket:ticket}},opts));
+        const vendor = await (await vendorModel.findOneAndUpdate({"_id":ticket.vendorId},{$push :{ticket:ticket}},opts));
         await session.commitTransaction();
         session.endSession();
         if(vendor){
@@ -157,24 +158,24 @@ exports.deleteTicket= async(req, res) => {
     // session.startTransaction();
     try{
         // const opts = {session};
-        // const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id},opts);
+        const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id});
         console.log(req.userId)
-        const ticketVend = await vendorModel.findByIdAndUpdate({"_id":req.userId},{"$pop":{"ticket":{"_id":req.query.ticket_id}}},{ safe:true,new:true});
+        const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticket}},{ safe:true,new:true});
         // await session.commitTransaction();
         // session.endSession();
-        if(ticketVend){
+        if(ticket){
             res.status(200).json({
                 status: true,
                 msg: 'Ticket successfully deleted.',
                 data: {
-                    ticketVend 
+                    ticket,ticketVend 
                 },
                 statusCode: 200
             });
         }else{
             res.status(200).json({
                 status: true,
-                msg: 'Ticket not deleted.',
+                msg: 'Ticket does not exist.',
                 data: {
                     ticketVend
                 },
@@ -216,6 +217,36 @@ exports.updateTicket= async(req, res) => {
             })
         }
     }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
+}
+
+exports.updateTicketImage = async (req, res) => {
+    try{
+        const result = await cloudinary.uploader.upload(req.file.path); 
+        const updateProfile = await Profile.findByIdAndUpdate({user_id: req.params.id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinary_id: result.public_id}}}, {new: true})
+        if(!updateProfile){
+            res.status(400).json({
+                status: true,
+                msg: 'Profile image not updated.',
+                statusCode: 200
+            });
+            return res.status(200).json({
+                status: true,
+                msg: 'Profile image updated.',
+                data: {
+                    updateProfile 
+                },
+                statusCode: 200
+            })
+        }
+    }catch{
         console.log(error);
         res.status(500).send({
             status: false,
