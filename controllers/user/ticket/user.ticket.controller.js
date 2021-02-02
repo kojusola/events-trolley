@@ -46,7 +46,7 @@ exports.createNewTicket= async(req, res) => {
             })
         }else{
         res.status(400).json({
-            status: true,
+            status: false,
             msg: 'Ticket not created',
             statusCode: 400
         })
@@ -78,7 +78,7 @@ exports.getOneTicket= async(req, res) => {
             })
         }else{
             res.status(400).json({
-                status: true,
+                status: false,
                 msg: 'Ticket does not exist.',
                 statusCode: 400
             })
@@ -108,7 +108,7 @@ exports.getAllTickets= async(req, res) => {
             })
         }else{
             res.status(400).json({
-                status: true,
+                status: false,
                 msg: 'there are no tickets',
                 statusCode: 400
             })
@@ -138,12 +138,12 @@ exports.getVerifiedTickets= async(req, res) => {
             })
         }else{
             res.status(400).json({
-                status: true,
+                status: false,
                 msg: 'Ticket does not exist.',
                 statusCode: 400
             })
         }
-    }catch{
+    }catch (error){
         console.log(error);
         res.status(500).send({
             status: false,
@@ -174,13 +174,13 @@ exports.deleteTicket= async(req, res) => {
                 statusCode: 200
             });
         }else{
-            res.status(200).json({
-                status: true,
+            res.status(400).json({
+                status: false,
                 msg: 'Ticket does not exist.',
                 data: {
                     ticketVend
                 },
-                statusCode: 200
+                statusCode: 400
             })
         }
     }catch(error){
@@ -212,9 +212,9 @@ exports.updateTicket= async(req, res) => {
             })
         }else{
             res.status(400).json({
-                status: true,
+                status: false,
                 msg: 'Ticket not updated.',
-                statusCode: 200
+                statusCode: 400
             })
         }
     }catch(error){
@@ -231,12 +231,13 @@ exports.updateTicket= async(req, res) => {
 exports.updateTicketImage = async (req, res) => {
     try{
         const result = await cloudinary.uploader.upload(req.file.path); 
-        const updateProfile = await Profile.findByIdAndUpdate({user_id: req.params.id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinary_id: result.public_id}}}, {new: true})
+        const updateTicket = await ticketModel.findByIdAndUpdate({_id: req.query.ticket_id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}}, {new: true})
+        const updateProfile = await vendorModel.findByIdAndUpdate({_id:updateTicket.vendorId, "ticket._id": req.query.ticket_id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}}, {new: true})
         if(!updateProfile){
             res.status(400).json({
-                status: true,
+                status: false,
                 msg: 'Profile image not updated.',
-                statusCode: 200
+                statusCode: 400
             });
             return res.status(200).json({
                 status: true,
@@ -247,7 +248,37 @@ exports.updateTicketImage = async (req, res) => {
                 statusCode: 200
             })
         }
-    }catch{
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
+}
+
+exports.vendorTickets= async(req, res) => {
+    try{
+        const ticket = await ticketModel.find({"vendor_id":req.userId});
+        if(ticket){
+            res.status(200).json({
+                status: true,
+                msg: 'Ticket request successful.',
+                data: {
+                    ticket
+                },
+                statusCode: 200
+            })
+        }else{
+            res.status(400).json({
+                status: false,
+                msg: 'There are no tickets created by the user.',
+                statusCode: 400
+            })
+        }
+    }catch(error){
         console.log(error);
         res.status(500).send({
             status: false,

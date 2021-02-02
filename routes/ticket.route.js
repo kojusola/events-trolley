@@ -7,6 +7,7 @@ const upload = require("./../helper/multer");
 // router.get('/',ticketController.getAllTickets;)
 router.post('/',verifyToken,restrictTo("vendor"),ticketController.createNewTicket);
 router.get('/', verifyToken,ticketController.getOneTicket);
+router.get('/users',verifyToken,ticketController.vendorTickets);
 router.get('/delete',verifyToken,ticketController.deleteTicket);
 router.patch('/updateImg',upload.single('image'),ticketController.updateTicketImage);
 router.patch('/update',verifyToken,restrictTo("vendor"), ticketController.updateTicket);
