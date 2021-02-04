@@ -49,5 +49,5 @@ const ticketModel = mongoose.Schema({
         type: Boolean,
         default: false
     }
-});
+})
 module.exports = mongoose.model('ticket', ticketModel);

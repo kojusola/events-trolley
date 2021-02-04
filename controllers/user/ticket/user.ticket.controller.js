@@ -20,6 +20,8 @@ exports.createNewTicket= async(req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
+        console.log(req.file);
+        console.log(req.file.path);
         const result = await cloudinary.uploader.upload(req.file.path); 
         const opts = {session,new:true};
         const ticket = new ticketModel({
