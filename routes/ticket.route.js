@@ -9,7 +9,7 @@ router.post('/',verifyToken,restrictTo("vendor"),ticketController.createNewTicke
 router.get('/', verifyToken,ticketController.getOneTicket);
 router.get('/users',verifyToken,ticketController.vendorTickets);
 router.get('/delete',verifyToken,ticketController.deleteTicket);
-router.patch('/updateImg',upload.single('image'),ticketController.updateTicketImage);
+router.patch('/updateImg',verifyToken,upload.single('image'),ticketController.updateTicketImage);
 router.patch('/update',verifyToken,restrictTo("vendor"), ticketController.updateTicket);
 
 module.exports = router;

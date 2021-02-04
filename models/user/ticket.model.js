@@ -22,11 +22,21 @@ const ticketModel = mongoose.Schema({
         required:true,
         min: 3,
     },
-    startDate:{
+    venueAddress: {
+        type:String,
+        required:true
+    },
+    eventStartDate: {
         type: Date
     },
-    endDate:{
-        type:Date
+    eventEndDate: {
+        type: Date
+    },
+    ticketSaleStartDate: {
+        type: Date
+    },
+    ticketSaleEndDate: {
+        type: Date
     },
     category:String,
     categories:[{

@@ -20,13 +20,22 @@ exports.createNewTicket= async(req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
+        const result = await cloudinary.uploader.upload(req.file.path); 
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
             eventName: req.body.eventName,
             eventVenue: req.body.eventVenue,
-            startDate: req.body.startDate,
-            endDate: req.body.endDate,
+            venueAddress: req.body.venueAddress,
+            eventStartDate: req.body.startDate,
+            eventEndDate: req.body.endDate,
+            ticketStartDate: req.body.endDate,
+            ticketEndDate: req.body.endDate,
+            ticketImage:
+             {
+                avatar:result.secure_url,
+                cloundinaryId: result.public_id
+            },
             category:req.body.category,
             categories: req.body.categories,
             verified: req.body.verified,
@@ -199,8 +208,12 @@ exports.deleteTicket= async(req, res) => {
 exports.updateTicket= async(req, res) => {
     try{
         const update = req.body
+        const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id})
         const ticket = await ticketModel.findOneAndUpdate({"_id":req.query.ticket_id},update,{new:true});
-        const vendor = await vendorModel.findOneAndUpdate({"ticket._id":req.query.ticket_id},update,{new:true});
+        const requiredObj = vendorModel.filter((item)=>item.id = req.query.ticket_id);
+        console.log(requiredObj)
+        // const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticketIn}},{ safe:true,new:true});
+        console.log(vendor)
         if(ticket){
             res.status(200).json({
                 status: true,
@@ -231,23 +244,26 @@ exports.updateTicket= async(req, res) => {
 exports.updateTicketImage = async (req, res) => {
     try{
         const result = await cloudinary.uploader.upload(req.file.path); 
-        const updateTicket = await ticketModel.findByIdAndUpdate({_id: req.query.ticket_id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}}, {new: true})
-        const updateProfile = await vendorModel.findByIdAndUpdate({_id:updateTicket.vendorId, "ticket._id": req.query.ticket_id}, {ticket:{ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}}, {new: true})
+        console.log(result);
+        const updateTicket = await ticketModel.findByIdAndUpdate({_id: req.query.ticket_id}, {ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}, {new: true});
+        console.log(updateTicket)
+        const updateProfile = await vendorModel.updateOne({"_id":req.userId,"ticket._id": req.query.ticket_id},{"$set":{"ticketImage":{avatar:result.secure_url,cloundinaryId: result.public_id}}},{new:true});
+        console.log(updateProfile);
         if(!updateProfile){
-            res.status(400).json({
+           return res.status(400).json({
                 status: false,
-                msg: 'Profile image not updated.',
+                msg: 'Ticket image not updated.',
                 statusCode: 400
             });
-            return res.status(200).json({
-                status: true,
-                msg: 'Profile image updated.',
-                data: {
-                    updateProfile 
-                },
-                statusCode: 200
-            })
         }
+        return res.status(200).json({
+            status: true,
+            msg: 'Ticket image updated.',
+            data: {
+                updateTicket 
+            },
+            statusCode: 200
+        })
     }catch(error){
         console.log(error);
         res.status(500).send({
