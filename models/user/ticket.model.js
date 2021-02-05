@@ -23,8 +23,7 @@ const ticketModel = mongoose.Schema({
         min: 3,
     },
     venueAddress: {
-        type:String,
-        required:true
+        type:String
     },
     eventStartDate: {
         type: Date

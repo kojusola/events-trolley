@@ -4,6 +4,7 @@ const connectDB = require('./config/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
+const fileUpload = require("express-fileupload")
 const port = process.env.PORT || 3000;
 
 // API Security
@@ -14,6 +15,11 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 connectDB();
+
+app.use(fileUpload({
+    useTempFiles : true,
+    tempFileDir : '/tmp/'
+}))
 
 //declare routes
 const adminAuth = require('./routes/auth/admin.auth.route');

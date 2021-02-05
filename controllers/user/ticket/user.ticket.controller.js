@@ -20,9 +20,8 @@ exports.createNewTicket= async(req, res) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
-        console.log(req.file);
-        console.log(req.file.path);
-        const result = await cloudinary.uploader.upload(req.file.path); 
+        const result = await cloudinary.uploader.upload(req.files.image.tempFilePath);
+        console.log(result)
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
@@ -212,7 +211,9 @@ exports.updateTicket= async(req, res) => {
         const update = req.body
         const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id})
         const ticket = await ticketModel.findOneAndUpdate({"_id":req.query.ticket_id},update,{new:true});
-        const requiredObj = vendorModel.filter((item)=>item.id = req.query.ticket_id);
+        console.log(vendorModel.ticket)
+        console.log(vendorModel);
+        const requiredObj = vendorModel.ticket.filter((item)=>item.id = req.query.ticket_id);
         console.log(requiredObj)
         // const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticketIn}},{ safe:true,new:true});
         console.log(vendor)
