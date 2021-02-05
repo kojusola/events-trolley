@@ -8,15 +8,15 @@ const cloudinary = require("../../../helper/cloudinary");
 
 
 exports.createNewTicket= async(req, res) => {
-    const { error } = newTicketValidation(req.body);
-    if (error) {
-        return res.status(400).json({
-            status: false,
-            msg: error.details[0].message,
-            data: null,
-            statusCode: 400
-        });
-    };
+    // const { error } = newTicketValidation(req.body);
+    // if (error) {
+    //     return res.status(400).json({
+    //         status: false,
+    //         msg: error.details[0].message,
+    //         data: null,
+    //         statusCode: 400
+    //     });
+    // };
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
