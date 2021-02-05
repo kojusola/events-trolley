@@ -21,7 +21,6 @@ exports.createNewTicket= async(req, res) => {
     session.startTransaction();
     try{
         const result = await cloudinary.uploader.upload(req.files.image.tempFilePath);
-        console.log(result)
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
