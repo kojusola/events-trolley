@@ -21,6 +21,7 @@ exports.createNewTicket= async(req, res) => {
     session.startTransaction();
     try{
         const result = await cloudinary.uploader.upload(req.files.image.tempFilePath);
+        console.log(result);
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
@@ -37,11 +38,12 @@ exports.createNewTicket= async(req, res) => {
                 cloundinaryId: result.public_id
             },
             category:req.body.category,
-            categories: req.body.categories,
+            categories: JSON.parse(req.body.categories),
             verified: req.body.verified,
         });
         await ticket.save(opts);
-        const vendor = await (await vendorModel.findOneAndUpdate({"_id":ticket.vendorId},{$push :{ticket:ticket}},opts));
+        const vendor = await vendorModel.findOneAndUpdate({"_id":ticket.vendorId},{$push :{ticket:ticket}},opts);
+        console.log(vendor);
         await session.commitTransaction();
         session.endSession();
         if(vendor){
