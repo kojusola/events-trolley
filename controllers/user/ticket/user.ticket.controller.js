@@ -37,7 +37,7 @@ exports.createNewTicket= async(req, res) => {
                 cloundinaryId: result.public_id
             },
             category:req.body.category,
-            categories: await JSON.parse(req.body.categories),
+            categories:JSON.parse(req.body.categories),
             verified: req.body.verified,
         });
         await ticket.save(opts);
