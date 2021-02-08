@@ -21,29 +21,27 @@ exports.createNewTicket= async(req, res) => {
     session.startTransaction();
     try{
         const result = await cloudinary.uploader.upload(req.files.image.tempFilePath);
-        console.log(result);
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
             eventName: req.body.eventName,
             eventVenue: req.body.eventVenue,
             venueAddress: req.body.venueAddress,
-            eventStartDate: req.body.startDate,
-            eventEndDate: req.body.endDate,
-            ticketStartDate: req.body.endDate,
-            ticketEndDate: req.body.endDate,
+            eventStartDate: req.body.eventStartDate,
+            eventEndDate: req.body.eventEndDate,
+            ticketSaleStartDate: req.body.ticketStartDate,
+            ticketSaleEndDate: req.body.ticketEndDate,
             ticketImage:
              {
                 avatar:result.secure_url,
                 cloundinaryId: result.public_id
             },
             category:req.body.category,
-            categories: JSON.parse(req.body.categories),
+            categories: await JSON.parse(req.body.categories),
             verified: req.body.verified,
         });
         await ticket.save(opts);
         const vendor = await vendorModel.findOneAndUpdate({"_id":ticket.vendorId},{$push :{ticket:ticket}},opts);
-        console.log(vendor);
         await session.commitTransaction();
         session.endSession();
         if(vendor){
@@ -210,14 +208,15 @@ exports.deleteTicket= async(req, res) => {
 exports.updateTicket= async(req, res) => {
     try{
         const update = req.body
-        const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id})
+        // const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id})
+        const vendor = await vendorModel.findOne({"_id":req.userId});
         const ticket = await ticketModel.findOneAndUpdate({"_id":req.query.ticket_id},update,{new:true});
-        console.log(vendorModel.ticket)
-        console.log(vendorModel);
-        const requiredObj = vendorModel.ticket.filter((item)=>item.id = req.query.ticket_id);
+        const requiredObj = await vendor.ticket
+        .filter((item)=>item._id = req.query.ticket_id);
+        // requiredObj.updateOne({},{item:ticket},{new:true});
         console.log(requiredObj)
         // const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticketIn}},{ safe:true,new:true});
-        console.log(vendor)
+        // console.log(vendor)
         if(ticket){
             res.status(200).json({
                 status: true,

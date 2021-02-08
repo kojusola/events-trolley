@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const helmet = require('helmet');
 const fileUpload = require("express-fileupload")
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // API Security
 // app.use(helmet());
