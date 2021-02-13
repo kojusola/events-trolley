@@ -26,23 +26,26 @@ const ticketModel = mongoose.Schema({
         type:String
     },
     eventStartDate: {
-        type: Date
+        type: String
     },
     eventEndDate: {
-        type: Date
+        type: String
     },
     ticketSaleStartDate: {
-        type: Date
+        type: String
     },
     ticketSaleEndDate: {
-        type: Date
+        type: String
     },
     category:String,
     categories:[{
         ticketName: String,
         description: String,
         numberOfTickets: Number,
-        price:String
+        price:{
+            type: String,
+            default: "none"
+        }
     }],
     verified:{
         type: Boolean,

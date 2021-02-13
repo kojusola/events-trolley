@@ -1,5 +1,5 @@
 const vendorModel = require('../../../models/user/vendor.auth.model');
-const {newTicketValidation} = require('../../../middlewares/user/user.ticket.validation');
+const {newTicketValidation, validateImage} = require('../../../middlewares/user/user.ticket.validation');
 const ticketModel = require('../../../models/user/ticket.model');
 const mongoose = require('mongoose');
 const userAuthValidation = require('../../../middlewares/user/user.auth.validation');
@@ -8,19 +8,30 @@ const cloudinary = require("../../../helper/cloudinary");
 
 
 exports.createNewTicket= async(req, res) => {
-    // const { error } = newTicketValidation(req.body);
-    // if (error) {
-    //     return res.status(400).json({
-    //         status: false,
-    //         msg: error.details[0].message,
-    //         data: null,
-    //         statusCode: 400
-    //     });
-    // };
+    //validate req.body
+    const { error } = newTicketValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    };
+    // validate req.files
+    const  message =  await validateImage(req.files);
+    if (message.bol){
+        return res.status(400).json({
+            status: false,
+            msg: message.msg,
+            data: null,
+            statusCode: 400
+        });
+    };
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
-        const result = await cloudinary.uploader.upload(req.files.image.tempFilePath);
+        const result = await cloudinary.uploader.upload(req.files.image.tempFilePath); 
         const opts = {session,new:true};
         const ticket = new ticketModel({
             vendorId: req.userId,
@@ -170,6 +181,7 @@ exports.deleteTicket= async(req, res) => {
         // const opts = {session};
         const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id});
         console.log(req.userId)
+        console.log(ticket)
         const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticket}},{ safe:true,new:true});
         // await session.commitTransaction();
         // session.endSession();
@@ -208,21 +220,20 @@ exports.deleteTicket= async(req, res) => {
 exports.updateTicket= async(req, res) => {
     try{
         const update = req.body
-        // const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id})
-        const vendor = await vendorModel.findOne({"_id":req.userId});
+        // const ticketIn = await ticketModel.findOne({"_id":req.query.ticket_id});
         const ticket = await ticketModel.findOneAndUpdate({"_id":req.query.ticket_id},update,{new:true});
-        const requiredObj = await vendor.ticket
-        .filter((item)=>item._id = req.query.ticket_id);
+        const vendorTickets = await ticketModel.find({"vendorId":req.userId});
+        // const requiredObj = await vendor.ticket
+        // .filter((item)=>item._id = req.query.ticket_id);
         // requiredObj.updateOne({},{item:ticket},{new:true});
-        console.log(requiredObj)
-        // const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticketIn}},{ safe:true,new:true});
-        // console.log(vendor)
+        // console.log(requiredObj)
+        const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$set":{"ticket":vendorTickets}},{ safe:true,new:true});
         if(ticket){
             res.status(200).json({
                 status: true,
                 msg: 'Ticket updated.',
                 data: {
-                    ticket
+                    ticket,ticketVend
                 },
                 statusCode: 200
             })

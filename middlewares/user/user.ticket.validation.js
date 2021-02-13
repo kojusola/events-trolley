@@ -6,14 +6,36 @@ const newTicketValidation = (data) => {
         eventName: joi.string().required(),
         eventVenue: joi.string().required(),
         venueAddress: joi.string().required(),
-        eventStartDate: joi.date().required(),
-        eventEndDate: joi.date().required(),
-        ticketStartDate: joi.date().required(),
-        ticketEndDate: joi.date().required(),
+        eventStartDate: joi.string().required(),
+        eventEndDate: joi.string().required(),
+        ticketStartDate: joi.string().required(),
+        ticketEndDate: joi.string().required(),
         category:joi.string().required(),
-        // categories: joi.array().required(),
+        categories: joi.array().required(),
         verified: joi.boolean()
     })
     return schema.validate(data);
 }
-module.exports = {newTicketValidation}
+const validateImage = (file) =>{
+    console.log((file.image.mimetype !== 'image/jpeg'))
+    if(JSON.stringify(file) === 'null'){
+        return {
+            bol: true,
+            msg:"image required"
+        }
+    }else if((file.image.mimetype === 'image/jpeg') && (file.image.mimetype === 'image/png') && (file.image.mimetype === 'image/jpg')){
+        return {
+            bol: true,
+            msg:"The image extension should either be jpeg/png/jpg"
+        }
+    } else if (file.image.size > 10*1024*1024){
+        return {
+            bol: true,
+            msg:"image is not of the right size"
+        }
+    }
+    return {
+        bol:false
+    }
+}
+module.exports = {newTicketValidation,validateImage}
