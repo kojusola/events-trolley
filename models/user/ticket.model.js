@@ -44,7 +44,7 @@ const ticketModel = mongoose.Schema({
         numberOfTickets: Number,
         price:{
             type: String,
-            default: "none"
+            default: null
         }
     }],
     verified:{

@@ -291,13 +291,13 @@ exports.updateTicketImage = async (req, res) => {
 
 exports.vendorTickets= async(req, res) => {
     try{
-        const ticket = await ticketModel.find({"vendor_id":req.userId});
-        if(ticket){
+        const tickets = await ticketModel.find({"vendorId":req.userId});
+        if(tickets){
             res.status(200).json({
                 status: true,
                 msg: 'Ticket request successful.',
                 data: {
-                    ticket
+                    tickets
                 },
                 statusCode: 200
             })
