@@ -7,6 +7,7 @@ const newTicketValidation = (data) => {
         eventVenue: joi.string().required(),
         venueAddress: joi.string().required(),
         eventStartDate: joi.string().required(),
+        eventTime: joi.string().required(),
         eventEndDate: joi.string().required(),
         ticketStartDate: joi.string().required(),
         ticketEndDate: joi.string().required(),

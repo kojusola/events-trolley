@@ -31,6 +31,9 @@ const ticketModel = mongoose.Schema({
     eventEndDate: {
         type: String
     },
+    eventTime: {
+        type: String
+    },
     ticketSaleStartDate: {
         type: String
     },

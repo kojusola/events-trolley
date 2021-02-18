@@ -37,6 +37,7 @@ exports.createNewTicket= async(req, res) => {
             vendorId: req.userId,
             eventName: req.body.eventName,
             eventVenue: req.body.eventVenue,
+            eventTime: req.body.eventTime,
             venueAddress: req.body.venueAddress,
             eventStartDate: req.body.eventStartDate,
             eventEndDate: req.body.eventEndDate,
