@@ -11,7 +11,7 @@ const newTicketValidation = (data) => {
         ticketStartDate: joi.string().required(),
         ticketEndDate: joi.string().required(),
         category:joi.string().required(),
-        categories: joi.array().required(),
+        // categories: joi.array().required(),
         verified: joi.boolean()
     })
     return schema.validate(data);
