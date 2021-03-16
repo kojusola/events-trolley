@@ -3,6 +3,8 @@ const express = require('express');
 const connectDB = require('./config/database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require("path");
+const fs = require('fs');
 const helmet = require('helmet');
 const fileUpload = require("express-fileupload")
 const port = process.env.PORT || 3000;
@@ -15,6 +17,11 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
 connectDB();
+
+// app.use(express.static(path.join(__dirname, 'public')))
+
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine','ejs')
 
 app.use(fileUpload({
     useTempFiles : true,

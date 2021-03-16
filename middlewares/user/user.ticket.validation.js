@@ -12,12 +12,13 @@ const newTicketValidation = (data) => {
         ticketStartDate: joi.string().required(),
         ticketEndDate: joi.string().required(),
         category:joi.string().required(),
-        categories: joi.array().items(joi.object({
-            ticketName:joi.string().required(),
-            description:joi.string().required(),
-            numberOfTickets:joi.number(),
-            price:joi.string()
-        })).required(),
+        categories: joi.string().required(),
+        // categories: joi.array().items(joi.object({
+        //     ticketName:joi.string().required(),
+        //     description:joi.string().required(),
+        //     numberOfTickets:joi.number(),
+        //     price:joi.string()
+        // })).required(),
         verified: joi.boolean()
     })
     return schema.validate(data);
@@ -43,5 +44,13 @@ const validateImage = (file) =>{
     return {
         bol:false
     }
+}
+
+const buyTicketValidation = (data) => {
+    const schema = joi.object({
+        ticketUserName: joi.string().required(),
+        ticketName: joi.string().required()
+    })
+    return schema.validate(data);
 }
 module.exports = {newTicketValidation,validateImage}

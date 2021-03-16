@@ -1,11 +1,14 @@
 require('dotenv').config();
 const customerModel = require('../../../models/user/customer.auth.model');
 const vendorModel = require('../../../models/user/vendor.auth.model');
+const profileModel = require('../../../models/user/profile.model');
+const accountModel = require('../../../models/user/account.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { loginValidation, customerRegisterValidation, vendorRegisterValidation ,
     emailValidation, resetPasswordValidation} = require('../../../middlewares/user/user.auth.validation');
 const { createAccessJWT } = require('../../../createVerifytoken');
+const mongoose = require('mongoose');
 const resetPinSchema = require('../../../models/admin/admin.resetpin.model')
 const { setPasswordResetIdUsers,updatenewpass,deleteId} = require('../../functions.controller');
 const{emailProcessor,getPinByEmailPin} = require('../../../helper/email.helper')
@@ -26,10 +29,10 @@ exports.userLogin = async(req, res) => {
         let user = null;
         if (userRole == 'customer') {
             user = await customerModel.findOne({ email: req.body.email })
-            user1 = await customerModel.findOne({ email: req.body.email }).select('password')
+            // user1 = await customerModel.findOne({ email: req.body.email }).select('password')
         } else if (userRole == 'vendor') {
             user = await vendorModel.findOne({ email: req.body.email })
-            user1 = await vendorModel.findOne({ email: req.body.email }).select('password')
+            // user1 = await vendorModel.findOne({ email: req.body.email }).select('password')
         }
         const oopsMessage = 'Oops, Your email or password is incorrect'
         if (!user) {
@@ -41,7 +44,7 @@ exports.userLogin = async(req, res) => {
             })
         }
         // check if password is correct
-        const validatePassword = await bcrypt.compare(req.body.password, user1.password);
+        const validatePassword = await bcrypt.compare(req.body.password, user.password);
         if (!validatePassword) {
             return res.status(401).json({
                 status: false,
@@ -58,17 +61,17 @@ exports.userLogin = async(req, res) => {
         // } else if (userRole == 'vendor') {
         //     const stored =  await storeUserRefreshJWT(user.id, refreshJWT,vendorModel)
         // }
-        if (user.role == "vendor"){
-           return res.status(200).json({
-                status: true,
-                msg: 'User logged in succesfully',
-                data: {
-                    role:user.role,
-                    token:accessJWT
-                }
-            });
+        // if (user.role == "vendor"){
+        //    return res.status(200).json({
+        //         status: true,
+        //         msg: 'User logged in succesfully',
+        //         data: {
+        //             role:user.role,
+        //             token:accessJWT
+        //         }
+        //     });
             
-        }
+        // }
         res.status(200).json({
             status: true,
             msg: 'User logged in succesfully',
@@ -101,11 +104,13 @@ exports.customerRegister = async(req, res) => {
             });
         }
     }
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         //check if email exists
         const userRole = req.body.role;
         let emailExist = null;
-
+        const opts = {session,new:true};
         if (userRole == 'customer') {
             emailExist = await customerModel.findOne({ email: req.body.email });
         } else {
@@ -133,29 +138,47 @@ exports.customerRegister = async(req, res) => {
         const user = new customerModel({
             fullname: req.body.fullname,
             email: req.body.email,
-            mobileNumber: req.body.mobileNumber,
             password: hashedPassword,
+            role: req.body.role
+        })
+
+        await user.save(opts);
+        const profile= new profileModel({
+            userId: user._id,
+            fullname: req.body.fullname,
+            email: req.body.email,
+            mobileNumber: req.body.mobileNumber,
             gender: req.body.gender,
             role: req.body.role
         })
 
-        await user.save();
+        await profile.save(opts);
+        const account = new accountModel({
+            userId: user._id,
+            balance: 0,
+        })
+
+        await account.save(opts);
+        await session.commitTransaction();
+        session.endSession();
         res.json({
             status: true,
             msg: 'User successfully created',
             data: {
                 id: user._id,
-                fullname: user.fullname,
-                email: user.email,
-                mobile: user.mobileNumber,
-                gender: user.gender,
-                role: user.role
+                fullname: profile.fullname,
+                email: profile.email,
+                mobile: profile.mobileNumber,
+                gender: profile.gender,
+                role: profile.role
             },
             statusCode: 200
         })
 
     } catch (error) {
-        console.log(error);
+        // console.log(error);
+        await session.abortTransaction();
+        session.endSession()
         res.status(500).send({
             status: false,
             msg: 'Internal Server Error',
@@ -177,12 +200,13 @@ exports.vendorRegister = async(req, res) => {
             });
         }
     }
-
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try {
         //check if email exists
         const userRole = req.body.role;
         let emailExist = null;
-
+        const opts = {session,new:true};
         if (userRole == 'vendor') {
             emailExist = await vendorModel.findOne({ email: req.body.email });
         } else {
@@ -210,8 +234,17 @@ exports.vendorRegister = async(req, res) => {
         const user = new vendorModel({
             fullname: req.body.fullname,
             email: req.body.email,
-            mobileNumber: req.body.mobileNumber,
             password: hashedPassword,
+            role: req.body.role,
+        })
+
+        await user.save(opts);
+
+        const profile = new profileModel({
+            userId: user._id,
+            fullname: req.body.fullname,
+            email: req.body.email,
+            mobileNumber: req.body.mobileNumber,
             gender: req.body.gender,
             role: req.body.role,
             businessName: req.body.businessName,
@@ -221,23 +254,33 @@ exports.vendorRegister = async(req, res) => {
             serviceType: req.body.serviceType
         })
 
-        await user.save();
+        await profile .save(opts);
+        const account = new accountModel({
+            userId: user._id,
+            balance: 0,
+        })
+
+        await account.save(opts);
+        await session.commitTransaction();
+        session.endSession();
         res.json({
             status: true,
             msg: 'User successfully created',
             data: {
                 id: user._id,
-                fullname: user.fullname,
-                email: user.email,
-                mobile: user.mobileNumber,
-                gender: user.gender,
-                role: user.role
+                fullname: profile .fullname,
+                email: profile.email,
+                mobile: profile.mobileNumber,
+                gender: profile .gender,
+                role: profile .role
             },
             statusCode: 200
         })
 
     } catch (error) {
         console.log(error);
+        await session.abortTransaction();
+        session.endSession()
         res.status(500).send({
             status: false,
             msg: 'Internal Server Error',

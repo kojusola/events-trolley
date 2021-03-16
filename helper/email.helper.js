@@ -1,5 +1,8 @@
 require('dotenv').config()
 const nodemailer = require('nodemailer');
+const htmlPdf = require('html-pdf');
+const ejs = require ('ejs');
+const htmlToPdfBuffer = require ('./convert.html.to.pdf');
 const { schema } = require('../models/admin/admin.auth.model');
 
 
@@ -89,5 +92,23 @@ const getPinByEmailPin = (email,pin,schema)=>{
         }
     })
 }
+const sendTicket = async ({vendorName,ticketUserName,customerName, eventName, eventVenue, eventTime, eventStartDate,eventEndDate,
+    ticketName,qrCodeImage, email}) =>{
+        const fileBuffer = await htmlToPdfBuffer("receipt.ejs",{
+            ticketUserName
+          });
+        var info = {
+            from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
+            to: email, // list of receivers
+            subject: "Password reset", // Subject line
+            text: `Hello ${customerName}`, // plain text body
+            html: `<p><b>Hello ${customerName},</b><p>
+            <p>This is your ticket receipt. Thank you patronizing Events trolley</p>`, // html body
+            attachments : { filename: "receipt.pdf",
+                             content: fileBuffer }
+          }
+        //   send(info);
 
-module.exports = {emailProcessor,getPinByEmailPin}
+}
+
+module.exports = {emailProcessor,getPinByEmailPin,sendTicket}

@@ -1,9 +1,11 @@
 const vendorModel = require('../../../models/user/vendor.auth.model');
 const {newTicketValidation, validateImage} = require('../../../middlewares/user/user.ticket.validation');
 const ticketModel = require('../../../models/user/ticket.model');
+const profileModel = require('../../../models/user/profile.model');
 const mongoose = require('mongoose');
 const userAuthValidation = require('../../../middlewares/user/user.auth.validation');
 const upload = require("../../../helper/multer");
+const {sendTicket} = require("../../../helper/email.helper")
 const cloudinary = require("../../../helper/cloudinary");
 
 
@@ -53,7 +55,7 @@ exports.createNewTicket= async(req, res) => {
             verified: req.body.verified,
         });
         await ticket.save(opts);
-        const vendor = await vendorModel.findOneAndUpdate({"_id":ticket.vendorId},{$push :{ticket:ticket}},opts);
+        const vendor = await profileModel.findOneAndUpdate({"userId":ticket.vendorId},{$push :{ticket:ticket}},opts);
         await session.commitTransaction();
         session.endSession();
         if(vendor){
@@ -183,7 +185,7 @@ exports.deleteTicket= async(req, res) => {
         const ticket = await ticketModel.findOneAndDelete({"_id":req.query.ticket_id});
         console.log(req.userId)
         console.log(ticket)
-        const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$pull":{"ticket":ticket}},{ safe:true,new:true});
+        const ticketVend = await profileModel.updateOne({"userId":req.userId},{"$pull":{"ticket":ticket}},{ safe:true,new:true});
         // await session.commitTransaction();
         // session.endSession();
         if(ticket){
@@ -228,7 +230,7 @@ exports.updateTicket= async(req, res) => {
         // .filter((item)=>item._id = req.query.ticket_id);
         // requiredObj.updateOne({},{item:ticket},{new:true});
         // console.log(requiredObj)
-        const ticketVend = await vendorModel.updateOne({"_id":req.userId},{"$set":{"ticket":vendorTickets}},{ safe:true,new:true});
+        const ticketVend = await profileModel.updateOne({"userId":req.userId},{"$set":{"ticket":vendorTickets}},{ safe:true,new:true});
         if(ticket){
             res.status(200).json({
                 status: true,
@@ -262,7 +264,7 @@ exports.updateTicketImage = async (req, res) => {
         console.log(result);
         const updateTicket = await ticketModel.findByIdAndUpdate({_id: req.query.ticket_id}, {ticketImage: {avatar:result.secure_url,cloundinaryId: result.public_id}}, {new: true});
         console.log(updateTicket)
-        const updateProfile = await vendorModel.updateOne({"_id":req.userId,"ticket._id": req.query.ticket_id},{"$set":{"ticketImage":{avatar:result.secure_url,cloundinaryId: result.public_id}}},{new:true});
+        const updateProfile = await profileModel.updateOne({"userId":req.userId,"ticket._id": req.query.ticket_id},{"$set":{"ticketImage":{avatar:result.secure_url,cloundinaryId: result.public_id}}},{new:true});
         console.log(updateProfile);
         if(!updateProfile){
            return res.status(400).json({
@@ -318,4 +320,26 @@ exports.vendorTickets= async(req, res) => {
             statusCode: 500
         });
     }
+}
+
+exports.buyTicket = async (req, res) => {
+    try{
+        const name = req.body.name;
+        await sendTicket({orderName:name});
+        return res.status(200).send({
+            status: true,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
+
 }

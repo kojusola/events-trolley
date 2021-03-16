@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const profileModel = mongoose.Schema({
+    userId : String,
     fullname: {
         type: String,
         required: true,
@@ -39,7 +40,8 @@ const profileModel = mongoose.Schema({
     },
     serviceType: {
         type: String
-    }
-});
+    },
+    ticket:[]
+},{timestamps: true});
 
-module.exports = mongoose.model('vendor', profileModel);
+module.exports = mongoose.model('profile', profileModel);
