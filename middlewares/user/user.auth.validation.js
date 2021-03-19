@@ -15,7 +15,8 @@ const customerRegisterValidation = (data) => {
         mobileNumber: joi.string().min(5).required(),
         gender: joi.string().min(3).required(),
         password: joi.string().min(3).required(),
-        role: joi.string().min(3).required()
+        role: joi.string().min(3).required(),
+        bvn: joi.string().min(3).required()
     })
     return schema.validate(data)
 }

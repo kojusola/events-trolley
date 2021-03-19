@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { v4 } = require('uuid');
 const customerModel = require('../../../models/user/customer.auth.model');
 const vendorModel = require('../../../models/user/vendor.auth.model');
 const profileModel = require('../../../models/user/profile.model');
@@ -11,7 +12,8 @@ const { createAccessJWT } = require('../../../createVerifytoken');
 const mongoose = require('mongoose');
 const resetPinSchema = require('../../../models/admin/admin.resetpin.model')
 const { setPasswordResetIdUsers,updatenewpass,deleteId} = require('../../functions.controller');
-const{emailProcessor,getPinByEmailPin} = require('../../../helper/email.helper')
+const{emailProcessor,getPinByEmailPin,sendAccountDetails} = require('../../../helper/email.helper');
+const{getHeader,getAccount}= require('../../../helper/monnify.helper')
 
 exports.userLogin = async(req, res) => {
     const { error } = loginValidation(req.body);
@@ -129,10 +131,16 @@ exports.customerRegister = async(req, res) => {
                 statusCode: 400
             });
         }
-
-        //hash the password
+        const header = await getHeader();
+        const accountDetails =await getAccount({header:header,accountName:req.body.fullname, accountReference:v4(),
+            customerEmail:req.body.email, customerBvn:req.body.bvn, accessToken:header.responseBody.accessToken});
+        // console.log(accountDetails);
+        
+        if(accountDetails.requestSuccessful){
+            //hash the password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        const hashedBvn = await bcrypt.hash(accountDetails.responseBody.bvn, salt);
 
         //prepare data to save
         const user = new customerModel({
@@ -143,6 +151,7 @@ exports.customerRegister = async(req, res) => {
         })
 
         await user.save(opts);
+        // console.log(user);
         const profile= new profileModel({
             userId: user._id,
             fullname: req.body.fullname,
@@ -153,28 +162,39 @@ exports.customerRegister = async(req, res) => {
         })
 
         await profile.save(opts);
+        // console.log(profile);
         const account = new accountModel({
             userId: user._id,
-            balance: 0,
+            accountName: accountDetails.responseBody.accountName,
+            accountNumber: accountDetails.responseBody.accounts[0].accountNumber,
+            referenceNumber: accountDetails.responseBody.accountReference,
+            accountBvn: hashedBvn,
+            bank: accountDetails.responseBody.accounts[0].bankName,
+            reservationReference: accountDetails.responseBody.reservationReference
         })
 
         await account.save(opts);
+        // console.log(account);
+        const sendAccount = await sendAccountDetails({accountName:account.accountName,
+                                accountNumber:account.accountNumber, bank:account.bank,
+                                customerName: req.body.fullname, email: req.body.email});
         await session.commitTransaction();
         session.endSession();
-        res.json({
-            status: true,
-            msg: 'User successfully created',
-            data: {
-                id: user._id,
-                fullname: profile.fullname,
-                email: profile.email,
-                mobile: profile.mobileNumber,
-                gender: profile.gender,
-                role: profile.role
-            },
-            statusCode: 200
-        })
+       res.json({
+                status: true,
+                msg: 'User successfully created',
+                data: {
+                    id: user._id,
+                    fullname: profile.fullname,
+                    email: profile.email,
+                    mobile: profile.mobileNumber,
+                    gender: profile.gender,
+                    role: profile.role
+                },
+                statusCode: 200
+            });
 
+        }
     } catch (error) {
         // console.log(error);
         await session.abortTransaction();
@@ -271,8 +291,8 @@ exports.vendorRegister = async(req, res) => {
                 fullname: profile .fullname,
                 email: profile.email,
                 mobile: profile.mobileNumber,
-                gender: profile .gender,
-                role: profile .role
+                gender: profile.gender,
+                role: profile.role
             },
             statusCode: 200
         })

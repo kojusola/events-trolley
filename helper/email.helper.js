@@ -111,4 +111,35 @@ const sendTicket = async ({vendorName,ticketUserName,customerName, eventName, ev
 
 }
 
-module.exports = {emailProcessor,getPinByEmailPin,sendTicket}
+const sendAccountDetails= async ({accountName, accountNumber, bank,email,customerName}) =>{
+    // console.log(accountName, accountNumber, bank)
+        var info = {
+            from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
+            to: "adeola5678@gmail.com", // list of receivers
+            subject: "Account Details", // Subject line
+            text: `Hello ${customerName}`, // plain text body
+            html: `<p><b>Hello ${customerName},</b><p>
+            <p>
+            You can now top up your Events Trolley wallet instantly by simply doing a bank transfer to this account number<br>
+            <b>
+            Account Name: ${accountName} <br>
+            Account Number:${accountNumber} <br>
+            Account Bank: ${bank} <br>
+            <b><br></p>
+            <p>This is instant and immediately you do the transfer, 
+            your wallet balance will be updated immediately. 
+            You can transfer at any time without even coming to our application and your balance will be topped up immediately.<br>
+            
+            This account number is dedicated to you.
+            You can save this account number as a beneficiary on your banking apps to make transferring even easier.
+            Remember you can also transfer via your bank’s USSD.<br>
+            
+            Please note that this account number is virtual and is simply linked to your EventTrolley wallet. 
+            You cannot actually interact with this account at the bank.</p>`, // html body
+        
+          }
+          send(info);
+
+}
+
+module.exports = {emailProcessor,getPinByEmailPin,sendTicket,sendAccountDetails}
