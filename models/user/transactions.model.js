@@ -11,7 +11,7 @@ const transactionModel = mongoose.Schema({
       purpose: {
         type: String,
         required: true,
-        enum:['deposit', 'transfer', 'reversal', 'withdraw']
+        enum:['deposit', 'transfer', 'reversal', 'withdraw','payment']
       },
       amount: {
         type: Number,
@@ -31,8 +31,7 @@ const transactionModel = mongoose.Schema({
         required: true
       },
       metadata: {
-        type: String,
-        required: true
+        type: String
       }
 },{timestamps: true});
 

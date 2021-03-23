@@ -4,72 +4,71 @@ const accountModel = require('../models/user/account.model');
 const transactionModel = require('../models/user/transactions.model');
 
 const creditAccount = async function({
-  amount, accountId,userId, purpose, reference = v4(), metadata, opts
+  amount,userId, purpose, reference , metadata, opts
 }) {
   const account = await accountModel.findOne({userId});
 
   if (!account) {
-    return res.status(400).json({
+    return {
       success: false,
       msg: 'Account does not exist',
-    });
+    }
   }
 
   await accountModel.findOneAndUpdate({userId}, {$inc : {'balance': amount},opts});
 
   const transaction =await transactionModel({
-                        txn_type: 'credit',
+                        transactionType: 'credit',
                         purpose,
                         amount,
                         userId,
-                        accountId,
+                        accountId:account._id,
                         reference,
                         metadata,
                         balanceBefore: Number(account.balance),
                         balanceAfter: Number(account.balance) + Number(amount)
                     });
             await transaction.save(opts)
-    return res.status(200).json({
-        success: true,
-        msg: 'Credit Successful',
-      });
+    return {
+        success: true
+      }
 }
 
 const debitAccount = async function({
-  amount, accountId,userId, purpose, reference = v4(), metadata, opts
+  amount,userId, purpose, reference, metadata, opts
 }) {
     const account = await accountModel.findOne({userId});
 
   if (!account) {
-    return res.status(400).json({
+    return {
       success: false,
       msg: 'Account does not exist',
-    });
-  }
+    }
+  } 
 
   if (Number(account.balance) < amount) {
-    return res.status(400).json({
+    return {
         success: false,
         msg: 'Insufficient Balance'
-      });
+    }
   }
   await accountModel.findOneAndUpdate({userId}, {$inc : {'balance': -amount},opts});
   const transaction =await transactionModel({
-    txn_type: 'credit',
+    transactionType: 'debit',
     purpose,
     amount,
     userId,
-    accountId,
+    accountId:account._id,
     reference,
     metadata,
     balanceBefore: Number(account.balance),
     balanceAfter: Number(account.balance) - Number(amount)
 });
 await transaction.save(opts)
-return res.status(200).json({
-success: true,
-msg: 'Debit Successful',
-});
+  return {
+  success: true,
+  reference: reference
+  }
 }
 
 module.exports = { creditAccount, debitAccount };

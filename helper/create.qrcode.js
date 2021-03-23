@@ -9,3 +9,5 @@ const generateQR = async text => {
       console.error(err)
     }
 }
+
+module.exports ={generateQR}

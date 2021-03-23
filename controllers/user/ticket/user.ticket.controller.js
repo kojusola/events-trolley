@@ -1,4 +1,5 @@
-const vendorModel = require('../../../models/user/vendor.auth.model');
+const ticketBoughtModel = require('../../../models/user/ticketsBought');
+const { v4 } = require('uuid');
 const {newTicketValidation, validateImage} = require('../../../middlewares/user/user.ticket.validation');
 const ticketModel = require('../../../models/user/ticket.model');
 const profileModel = require('../../../models/user/profile.model');
@@ -7,6 +8,10 @@ const userAuthValidation = require('../../../middlewares/user/user.auth.validati
 const upload = require("../../../helper/multer");
 const {sendTicket} = require("../../../helper/email.helper")
 const cloudinary = require("../../../helper/cloudinary");
+const {reduceNumber} = require("../../../helper/reduceTicketNumber");
+const {creditAccount, debitAccount} = require("../../../helper/transactions");
+const {generateQR} = require("../../../helper/create.qrcode");
+const htmlToPdfBuffer= require("../../../helper/convert.html.to.pdf");
 
 
 exports.createNewTicket= async(req, res) => {
@@ -21,6 +26,7 @@ exports.createNewTicket= async(req, res) => {
     //     });
     // };
     // validate req.files
+    console.log(req.files)
     const  message =  await validateImage(req.files);
     if (message.bol){
         return res.status(400).json({
@@ -55,7 +61,9 @@ exports.createNewTicket= async(req, res) => {
             verified: req.body.verified,
         });
         await ticket.save(opts);
+        console.log(ticket);
         const vendor = await profileModel.findOneAndUpdate({"userId":ticket.vendorId},{$push :{ticket:ticket}},opts);
+        console.log(vendor);
         await session.commitTransaction();
         session.endSession();
         if(vendor){
@@ -322,18 +330,163 @@ exports.vendorTickets= async(req, res) => {
     }
 }
 
-exports.buyTicket = async (req, res) => {
+exports.regBuyTicket = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
     try{
-        const name = req.body.name;
-        await sendTicket({orderName:name});
+        const opts = {session,new:true};
+        const ticketDetails =  await ticketModel.findOne({"_id":req.body.ticketId});
+        if(!ticketDetails){
+            return res.status(400).send({
+                status: true,
+                msg: 'Ticket Does not exist',
+                data: null,
+                statusCode: 400
+            });
+        }
+        const customerDetails =  await profileModel.findOne({"userId":req.body.userId});
+        console.log(customerDetails,req.body.userId);
+        const vendorDetails =  await profileModel.findOne({"userId":req.body.vendorId});
+        const debit = await debitAccount({amount:req.body.amount, userId : req.body.userId,reference:v4(), purpose: "payment", opts});
+        const credit = await creditAccount({amount:req.body.amount,userId:req.body.vendorId,reference:v4(), purpose: "payment",metadata:debit.reference, opts});
+        console.log(!credit.success,!debit.success)
+        if((!credit.success)||(!debit.success)){
+            return res.status(200).send({
+                status: true,
+                msg: credit.msg||debit.msg,
+                data: null,
+                statusCode: 200
+            });
+        }
+        const tickets = req.body.tickets
+        const attachments = []
+        for (let i =0; i<tickets.length; i++){
+            const ticket =  await ticketModel.findOneAndUpdate({"_id":req.body.ticketId,"categories.ticketName":tickets[i].ticketType },
+            {$inc : {'categories.$.numberOfTickets': -1}}, opts);
+            let qrCodeImage = generateQR(`name : ${tickets[i].name}, TicketName: ${tickets[i].ticketType}`)
+            let ticketUserName = tickets[i].name
+            let fileBuffer = await htmlToPdfBuffer("receipt.ejs",{
+                ticketUserName
+              });
+              let fileObject ={
+                 filename: "receipt.pdf",
+                content: fileBuffer 
+              }
+              console.log(fileObject)
+              attachments.push(fileObject);
+              const ticketsBought = new ticketBoughtModel({
+                vendorId: req.body.vendorId,
+                customerId: req.body.userId,
+                ticketId: req.body.ticketId,
+                ticketUserName:ticketUserName,
+                ticketType: tickets[i].ticketType,
+                eventName:ticketDetails.eventName,
+                eventVenue:ticketDetails.eventVenue,
+                eventTime:ticketDetails.eventTime,
+                venueAddress:  ticketDetails.venueAddress,
+                eventStartDate:  ticketDetails.eventStartDate,
+                eventEndDate: ticketDetails.eventEndDate
+            });
+            await ticketsBought.save(opts);
+        }
+        const email = sendTicket({attachments:attachments,
+            customerName:  customerDetails.fullname , email: customerDetails.email});
+        
+        await session.commitTransaction();
+        session.endSession();
         return res.status(200).send({
             status: true,
+            msg: 'Ticket sale successful',
+            data: null,
+            statusCode: 200
+        });
+    }catch(error){
+        console.log(error);
+        await session.abortTransaction();
+        session.endSession()
+        res.status(500).send({
+            status: false,
             msg: 'Internal Server Error',
             data: null,
             statusCode: 500
         });
+    }
+
+}
+
+
+
+exports.buyTicket = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try{
+        const opts = {session,new:true};
+        const ticketDetails =  await ticketModel.findOne({"_id":req.body.ticketId});
+        if(!ticketDetails){
+            return res.status(400).send({
+                status: true,
+                msg: 'Ticket Does not exist',
+                data: null,
+                statusCode: 400
+            });
+        }
+        const vendorDetails =  await profileModel.findOne({"userId":ticketDetails.vendorId});
+        console.log(vendorDetails);
+        const credit = await creditAccount({amount:req.body.amount,userId:ticketDetails.vendorId,purpose: "payment",reference:req.body.paymentReference, opts});
+        if((!credit.success)){
+            return res.status(200).send({
+                status: true,
+                msg: credit.msg,
+                data: null,
+                statusCode: 200
+            });
+        }
+        const tickets = req.body.tickets
+        const attachments = []
+        for (let i =0; i<tickets.length; i++){
+            const ticket =  await ticketModel.findOneAndUpdate({"_id":req.body.ticketId,"categories.ticketName":tickets[i].ticketType },
+            {$inc : {'categories.$.numberOfTickets': -1}}, opts);
+            let qrCodeImage = generateQR(`name : ${tickets[i].name}, TicketName: ${tickets[i].ticketType}`)
+            let ticketUserName = tickets[i].name
+            let fileBuffer = await htmlToPdfBuffer("receipt.ejs",{
+                ticketUserName
+              });
+              let fileObject ={
+                 filename: "receipt.pdf",
+                content: fileBuffer 
+              }
+              console.log(fileObject)
+              attachments.push(fileObject);
+              const ticketsBought = new ticketBoughtModel({
+                vendorId: req.body.vendorId,
+                customerId: req.body.userId,
+                ticketId: req.body.ticketId,
+                ticketUserName:ticketUserName,
+                ticketType: tickets[i].ticketType,
+                eventName:ticketDetails.eventName,
+                eventVenue:ticketDetails.eventVenue,
+                eventTime:ticketDetails.eventTime,
+                venueAddress:  ticketDetails.venueAddress,
+                eventStartDate:  ticketDetails.eventStartDate,
+                eventEndDate: ticketDetails.eventEndDate
+            });
+            await ticketsBought.save(opts);
+        }
+        const email = sendTicket({attachments:attachments,
+            customerName: req.body.customerName , email:req.body.customerEmail});
+        
+        await session.commitTransaction();
+        session.endSession();
+        return res.status(200).send({
+            status: true,
+            msg: 'Ticket sale successful',
+            data: null,
+            statusCode: 200
+        });
     }catch(error){
         console.log(error);
+        await session.abortTransaction();
+        session.endSession()
         res.status(500).send({
             status: false,
             msg: 'Internal Server Error',

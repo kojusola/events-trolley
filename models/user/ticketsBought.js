@@ -3,27 +3,24 @@ const mongoose = require('mongoose');
 const ticketBoughtModel = mongoose.Schema({
     vendorId : String,
     customerId: String,
+    ticketId: String,
     ticketUserName: {
         type: String,
-        required: true,
         min: 3,
         max: 255
     },
     ticketType: {
         type: String,
-        required: true,
         min: 3,
         max: 255
     },
     eventName:{
         type: String,
-        required: true,
         min: 3,
         max: 255
     },
     eventVenue:{
         type:String,
-        required:true,
         min: 3,
     },
     venueAddress: {

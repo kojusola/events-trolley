@@ -31,9 +31,34 @@ async function chargeCard1() {
             Authorization:"Basic TUtfUFJPRF9XRlJMSERBQkZNOkY4Q1NIN0xXOVROWE1aTEQ3UFhGNUNZTVRIUThCOFYz"
         }
       });
-      return console.log(charge1.data)
+          const bankCodes= await axios.get( "https://sandbox.monnify.com/api/v1/banks", {
+            headers: {
+                Authorization:`Bearer ${charge1.data.responseBody.accessToken} `
+            }
+          });
+          const bankName = "Diamond bank";
+          for(let i = 0; i < bankCodes.data.responseBody.length; i++ ){
+          if(bankCodes.data.responseBody[i].name === bankName){
+            const bankCode = bankCodes.data.responseBody[i].code;
+            return console.log( bankCode)
+        }
+      }
     }catch(error){
         console.log(error)
     }
 };
-chargeCard1();
+// chargeCard1();
+const crypto = require('crypto')
+const calculateHash = async function(){
+  try{
+      let hash = await crypto.createHash('sha512');
+      let data = hash.update('adeola', 'utf-8');
+      let gen_hash= data.digest('hex')
+      console.log(gen_hash);
+  }catch(error){
+  console.log(error)
+  }
+}
+
+
+calculateHash();

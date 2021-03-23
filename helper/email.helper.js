@@ -3,7 +3,10 @@ const nodemailer = require('nodemailer');
 const htmlPdf = require('html-pdf');
 const ejs = require ('ejs');
 const htmlToPdfBuffer = require ('./convert.html.to.pdf');
+const {ticketName} = require ('./create.qrcode');
 const { schema } = require('../models/admin/admin.auth.model');
+const ticketBoughtModel = require('../models/user/ticketsBought');
+const ticketModel = require('../models/user/ticket.model');
 
 
 const transporter = nodemailer.createTransport({
@@ -92,22 +95,17 @@ const getPinByEmailPin = (email,pin,schema)=>{
         }
     })
 }
-const sendTicket = async ({vendorName,ticketUserName,customerName, eventName, eventVenue, eventTime, eventStartDate,eventEndDate,
-    ticketName,qrCodeImage, email}) =>{
-        const fileBuffer = await htmlToPdfBuffer("receipt.ejs",{
-            ticketUserName
-          });
+const sendTicket = async ({attachments, customerName,email}) =>{
         var info = {
             from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
-            to: email, // list of receivers
-            subject: "Password reset", // Subject line
+            to: "adeola5678@gmail.com", // list of receivers
+            subject: "Ticket Receipt", // Subject line
             text: `Hello ${customerName}`, // plain text body
             html: `<p><b>Hello ${customerName},</b><p>
-            <p>This is your ticket receipt. Thank you patronizing Events trolley</p>`, // html body
-            attachments : { filename: "receipt.pdf",
-                             content: fileBuffer }
+            <p>These are your receipts. Thank you patronizing Events trolley</p>`, // html body
+            attachments : attachments
           }
-        //   send(info);
+          send(info);
 
 }
 
@@ -115,7 +113,7 @@ const sendAccountDetails= async ({accountName, accountNumber, bank,email,custome
     // console.log(accountName, accountNumber, bank)
         var info = {
             from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
-            to: "adeola5678@gmail.com", // list of receivers
+            to: email, // list of receivers
             subject: "Account Details", // Subject line
             text: `Hello ${customerName}`, // plain text body
             html: `<p><b>Hello ${customerName},</b><p>

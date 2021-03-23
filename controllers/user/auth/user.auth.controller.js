@@ -165,6 +165,7 @@ exports.customerRegister = async(req, res) => {
         // console.log(profile);
         const account = new accountModel({
             userId: user._id,
+            balance:0,
             accountName: accountDetails.responseBody.accountName,
             accountNumber: accountDetails.responseBody.accounts[0].accountNumber,
             referenceNumber: accountDetails.responseBody.accountReference,

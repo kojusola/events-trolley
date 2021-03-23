@@ -34,6 +34,7 @@ const userAuth = require('./routes/auth/user.auth.route');
 const adminProfile = require('./routes/profile/admin.profile.route');
 const userProfile = require('./routes/profile/user.profile.route');
 const ticket = require('./routes/ticket.route');
+const payOut = require('./routes/payment/vendor.payment.route');
 //const tokens = require('./routes/token.route');
 
 //use routes
@@ -47,6 +48,8 @@ app.use('/profile/user', userProfile);
 //app.use('/tokens', tokens);
 //ticket
 app.use('/ticket', ticket);
+//vendor payout route
+app.use('/payout', ticket);
 
 
 
