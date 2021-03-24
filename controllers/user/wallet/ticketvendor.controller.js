@@ -18,7 +18,7 @@ exports.vendorPayOut = async function (req, res) {
             const getPayOut = await payOut({header:header,amount: req.body.amount,
                  destinationAccountNumber: req.body.accountNumber,transactionReference: v4(),
                   bankCode: bankCode}); 
-            if(!getPayOut.requestSuccessful){
+            if(getPayOut.responseBody.status !=="SUCCESS"){
                return res.status(500).send({
                     status: false,
                     msg: 'Server Error',
@@ -62,7 +62,7 @@ exports.otpValidation = async(req, res) => {
     try{
         const opts = {session,new:true};
         const validation = validateOtp({reference:req.body.reference,authorizationCode:req.body.otp});
-        if(!validation.requestSuccessful){
+        if(validation.responseMessage !=="success"){
             return res.status(500).send({
                  status: false,
                  msg: 'validation Error',

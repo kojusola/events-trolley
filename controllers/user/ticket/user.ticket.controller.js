@@ -1,6 +1,6 @@
 const ticketBoughtModel = require('../../../models/user/ticketsBought');
 const { v4 } = require('uuid');
-const {newTicketValidation, validateImage} = require('../../../middlewares/user/user.ticket.validation');
+const {newTicketValidation, validateImage,buyTicketValidation} = require('../../../middlewares/user/user.ticket.validation');
 const ticketModel = require('../../../models/user/ticket.model');
 const profileModel = require('../../../models/user/profile.model');
 const mongoose = require('mongoose');
@@ -12,21 +12,20 @@ const {reduceNumber} = require("../../../helper/reduceTicketNumber");
 const {creditAccount, debitAccount} = require("../../../helper/transactions");
 const {generateQR} = require("../../../helper/create.qrcode");
 const htmlToPdfBuffer= require("../../../helper/convert.html.to.pdf");
+const {payoutAmount}= require("../../../helper/payoutPercentage.helper");
+const {transactionStatus}= require("../../../helper/monnify.helper");
 
 
 exports.createNewTicket= async(req, res) => {
-    //validate req.body
-    // const { error } = newTicketValidation(req.body);
-    // if (error) {
-    //     return res.status(400).json({
-    //         status: false,
-    //         msg: error.details[0].message,
-    //         data: null,
-    //         statusCode: 400
-    //     });
-    // };
-    // validate req.files
-    console.log(req.files)
+    const { error } = newTicketValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    };
     const  message =  await validateImage(req.files);
     if (message.bol){
         return res.status(400).json({
@@ -331,6 +330,15 @@ exports.vendorTickets= async(req, res) => {
 }
 
 exports.regBuyTicket = async (req, res) => {
+    const { error } = buyTicketValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    };
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
@@ -346,9 +354,12 @@ exports.regBuyTicket = async (req, res) => {
         }
         const customerDetails =  await profileModel.findOne({"userId":req.body.userId});
         console.log(customerDetails,req.body.userId);
-        const vendorDetails =  await profileModel.findOne({"userId":req.body.vendorId});
+        console.log(ticketDetails);
+        console.log(ticketDetails.vendorId);
+        const vendorDetails =  await profileModel.findOne({"userId":ticketDetails.vendorId});
+        console.log(vendorDetails);
         const debit = await debitAccount({amount:req.body.amount, userId : req.body.userId,reference:v4(), purpose: "payment", opts});
-        const credit = await creditAccount({amount:req.body.amount,userId:req.body.vendorId,reference:v4(), purpose: "payment",metadata:debit.reference, opts});
+        const credit = await creditAccount({amount:req.body.amount,userId:ticketDetails.vendorId,reference:v4(), purpose: "payment",metadata:debit.reference, opts});
         console.log(!credit.success,!debit.success)
         if((!credit.success)||(!debit.success)){
             return res.status(200).send({
@@ -417,9 +428,27 @@ exports.regBuyTicket = async (req, res) => {
 
 
 exports.buyTicket = async (req, res) => {
+    const { error } = buyTicketValidation(req.body);
+    if (error) {
+        return res.status(400).json({
+            status: false,
+            msg: error.details[0].message,
+            data: null,
+            statusCode: 400
+        });
+    };
     const session = await mongoose.startSession();
     session.startTransaction();
     try{
+        const status = await transactionStatus({paymentReference:req.body.paymentReference})
+        if(status.responseBody.paymentStatus !== "PAID"){
+            res.status(400).send({
+                status: false,
+                msg: 'Payment Failed',
+                data: null,
+                statusCode: 400
+            });
+        }
         const opts = {session,new:true};
         const ticketDetails =  await ticketModel.findOne({"_id":req.body.ticketId});
         if(!ticketDetails){

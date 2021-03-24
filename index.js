@@ -35,6 +35,7 @@ const adminProfile = require('./routes/profile/admin.profile.route');
 const userProfile = require('./routes/profile/user.profile.route');
 const ticket = require('./routes/ticket.route');
 const payOut = require('./routes/payment/vendor.payment.route');
+const webhook = require('./routes/payment/webhook.payment.route');
 //const tokens = require('./routes/token.route');
 
 //use routes
@@ -50,6 +51,8 @@ app.use('/profile/user', userProfile);
 app.use('/ticket', ticket);
 //vendor payout route
 app.use('/payout', ticket);
+//webhooks
+app.use('/webhook', webhook);
 
 
 

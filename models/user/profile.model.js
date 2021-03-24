@@ -26,6 +26,10 @@ const profileModel = mongoose.Schema({
         type: String,
         required: true,
     },
+    vendorPayoutPercentage:{
+        type:Number,
+        Default:100
+    },
     businessName: {
         type: String
     },

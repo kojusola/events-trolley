@@ -48,9 +48,14 @@ const validateImage = (file) =>{
 
 const buyTicketValidation = (data) => {
     const schema = joi.object({
-        ticketUserName: joi.string().required(),
-        ticketName: joi.string().required()
+        ticketId: joi.string().required(),
+        userId:joi.string(),
+        customerName:joi.string(),
+        customerEmail:joi.string(),
+        paymentReference:joi.string(),
+        amount: joi.number().required(),
+        tickets: joi.array().required()
     })
     return schema.validate(data);
 }
-module.exports = {newTicketValidation,validateImage}
+module.exports = {newTicketValidation,validateImage,buyTicketValidation}
