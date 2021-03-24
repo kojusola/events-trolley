@@ -39,16 +39,19 @@ const getAccount = async function({header,accountName, accountReference,customer
     }
 };
 
-const getBankCodes = async function(accessToken,bankName) {
+const getBankCodes = async function(
+    {accessToken,bankName}) {
     try {
       const bankCodes= await axios.get( "https://sandbox.monnify.com/api/v1/banks", {
         headers: {
             Authorization:`Bearer ${accessToken}`
         }
       });
+      console.log(bankCodes.data)
         for(let i = 0; i < bankCodes.data.responseBody.length; i++ ){
         if(bankCodes.data.responseBody[i].name === bankName){
         const bankCode = bankCodes.data.responseBody[i].code;
+        console.log(bankCode)
         return bankCode;
         }
     }

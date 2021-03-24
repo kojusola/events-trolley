@@ -12,6 +12,6 @@ router.get('/delete',verifyToken,ticketController.deleteTicket);
 router.patch('/updateImg',verifyToken,upload.single('image'),ticketController.updateTicketImage);
 router.patch('/update',verifyToken,restrictTo("vendor"), ticketController.updateTicket);
 router.post('/buy',ticketController.buyTicket);
-router.post('/user/buy',ticketController.regBuyTicket);
+router.post('/user/buy',verifyToken,ticketController.regBuyTicket);
 
 module.exports = router;

@@ -14,7 +14,10 @@ exports.vendorPayOut = async function (req, res) {
         const account = await accountModel.findOne({userId:_id});
         if(account.balance>0 && account.balance>=req.body.amount && req.body.amount !== 0){
             const header = await getHeader();
-            const bankCode = await getBankCodes(header.responseBody.accessToken, req.body.bankName);
+            console.log(header)
+            const bankCode = await getBankCodes({accessToken:header.responseBody.accessToken,
+                bankName:req.body.bankName});
+            console.log(bankCode)
             const getPayOut = await payOut({header:header,amount: req.body.amount,
                  destinationAccountNumber: req.body.accountNumber,transactionReference: v4(),
                   bankCode: bankCode}); 

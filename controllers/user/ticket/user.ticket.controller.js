@@ -457,7 +457,7 @@ exports.buyTicket = async (req, res) => {
                 msg: 'Ticket Does not exist',
                 data: null,
                 statusCode: 400
-            });
+            })
         }
         const vendorDetails =  await profileModel.findOne({"userId":ticketDetails.vendorId});
         console.log(vendorDetails);

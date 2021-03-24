@@ -40,14 +40,15 @@ async function chargeCard1() {
           for(let i = 0; i < bankCodes.data.responseBody.length; i++ ){
           if(bankCodes.data.responseBody[i].name === bankName){
             const bankCode = bankCodes.data.responseBody[i].code;
-            return console.log( bankCode)
+            return  bankCode
         }
       }
     }catch(error){
         console.log(error)
     }
 };
-// chargeCard1();
+const hello = chargeCard1();
+console.log(hello);
 const crypto = require('crypto')
 const calculateHash = async function(){
   try{
@@ -61,4 +62,4 @@ const calculateHash = async function(){
 }
 
 
-calculateHash();
+// calculateHash();

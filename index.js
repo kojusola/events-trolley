@@ -50,7 +50,7 @@ app.use('/profile/user', userProfile);
 //ticket
 app.use('/ticket', ticket);
 //vendor payout route
-app.use('/payout', ticket);
+app.use('/payout', payOut);
 //webhooks
 app.use('/webhook', webhook);
 
