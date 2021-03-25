@@ -47,11 +47,10 @@ const getBankCodes = async function(
             Authorization:`Bearer ${accessToken}`
         }
       });
-      console.log(bankCodes.data)
+      
         for(let i = 0; i < bankCodes.data.responseBody.length; i++ ){
         if(bankCodes.data.responseBody[i].name === bankName){
         const bankCode = bankCodes.data.responseBody[i].code;
-        console.log(bankCode)
         return bankCode;
         }
     }

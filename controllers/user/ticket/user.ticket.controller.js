@@ -461,7 +461,10 @@ exports.buyTicket = async (req, res) => {
         }
         const vendorDetails =  await profileModel.findOne({"userId":ticketDetails.vendorId});
         console.log(vendorDetails);
-        const credit = await creditAccount({amount:req.body.amount,userId:ticketDetails.vendorId,purpose: "payment",reference:req.body.paymentReference, opts});
+        const amount = await payoutAmount({amount:req.body.amount,
+            percentage:vendorDetails.vendorPayoutPercentage});
+        const credit = await creditAccount({amount:amount,userId:ticketDetails.vendorId,
+            purpose: "payment",reference:req.body.paymentReference, opts});;
         if((!credit.success)){
             return res.status(200).send({
                 status: true,

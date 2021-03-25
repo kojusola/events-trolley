@@ -14,19 +14,19 @@ exports.vendorPayOut = async function (req, res) {
         const account = await accountModel.findOne({userId:_id});
         if(account.balance>0 && account.balance>=req.body.amount && req.body.amount !== 0){
             const header = await getHeader();
-            console.log(header)
             const bankCode = await getBankCodes({accessToken:header.responseBody.accessToken,
                 bankName:req.body.bankName});
-            console.log(bankCode)
             const getPayOut = await payOut({header:header,amount: req.body.amount,
                  destinationAccountNumber: req.body.accountNumber,transactionReference: v4(),
                   bankCode: bankCode}); 
-            if(getPayOut.responseBody.status !=="SUCCESS"){
-               return res.status(500).send({
-                    status: false,
-                    msg: 'Server Error',
-                    data: null,
-                    statusCode: 500
+            if(getPayOut.responseBody.status ==="PENDING_AUTHORIZATION"){
+                return  res.status(200).send({
+                    status: true,
+                    msg: 'Payment Pending Authorization',
+                    data: {
+                        "reference": getPayOut.responseBody.reference
+                    },
+                    statusCode: 200
                 });
             }
         }else{
@@ -37,13 +37,11 @@ exports.vendorPayOut = async function (req, res) {
                 statusCode: 400
             });
         }
-       return  res.status(200).send({
+       return  res.status(400).send({
             status: true,
-            msg: 'Payment Pending Authorization',
-            data: {
-                "reference": getPayOut.responseBody.reference
-            },
-            statusCode: 200
+            msg: 'Failed Request',
+            data:null,
+            statusCode: 400
         });
 
 
