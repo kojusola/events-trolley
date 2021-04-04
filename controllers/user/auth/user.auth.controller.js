@@ -272,7 +272,8 @@ exports.vendorRegister = async(req, res) => {
             businessNumber: req.body.businessNumber,
             location: req.body.location,
             socials: req.body.socials,
-            serviceType: req.body.serviceType
+            serviceType: req.body.serviceType,
+            vendorPayoutPercentage: 100
         })
 
         await profile .save(opts);

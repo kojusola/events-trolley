@@ -43,7 +43,8 @@ exports.adminLogin = async(req, res) => {
         }
         //assign token
           //assign assess and refresh tokens
-          const accessJWT = await createAccessJWT(admin.email, admin.id)
+        //   console.log(admin.role)
+          const accessJWT = await createAccessJWT(admin.role, admin.id)
           //const refreshJWT = await createRefreshJWT(admin.email)
           //const stored =  await storeUserRefreshJWT(admin.id, refreshJWT,adminUserModel)
 
@@ -98,7 +99,8 @@ exports.adminRegister = async(req, res) => {
         const admin = new adminUserModel({
             fullname: req.body.fullname,
             email: req.body.email,
-            password: hashedPassword
+            password: hashedPassword,
+            role: "admin"
         })
 
         //save admin

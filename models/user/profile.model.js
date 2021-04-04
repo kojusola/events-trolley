@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+var mongoosePaginate = require('mongoose-paginate');
 
 const profileModel = mongoose.Schema({
     userId : String,
@@ -27,8 +28,7 @@ const profileModel = mongoose.Schema({
         required: true,
     },
     vendorPayoutPercentage:{
-        type:Number,
-        Default:100
+        type:Number
     },
     businessName: {
         type: String
@@ -47,5 +47,7 @@ const profileModel = mongoose.Schema({
     },
     ticket:[]
 },{timestamps: true});
+
+profileModel.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('profile', profileModel);

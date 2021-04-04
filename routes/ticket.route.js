@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const ticketController = require('../controllers/user/ticket/user.ticket.controller');
+const adminTicketController = require('../controllers/admin/ticket/admin.ticket.controller');
 const { verifyToken,restrictTo } = require('../middlewares/authorization.middleware');
 const upload = require("./../helper/multer");
 
@@ -13,5 +14,7 @@ router.patch('/updateImg',verifyToken,upload.single('image'),ticketController.up
 router.patch('/update',verifyToken,restrictTo("vendor"), ticketController.updateTicket);
 router.post('/buy',ticketController.buyTicket);
 router.post('/user/buy',verifyToken,ticketController.regBuyTicket);
+router.get('/all',verifyToken,restrictTo("admin"),adminTicketController.getAllTickets);
+router.get('/verify',verifyToken,restrictTo("admin"),adminTicketController.verifyTicket);
 
 module.exports = router;

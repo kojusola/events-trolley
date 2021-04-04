@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const adminController = require('../../controllers/admin/profile/admin.profile.controller');
-const { verifyToken } = require('../../middlewares/authorization.middleware')
+const { verifyToken, restrictTo } = require('../../middlewares/authorization.middleware');
+
 
 router.get('/', verifyToken, adminController.adminProfile);
 

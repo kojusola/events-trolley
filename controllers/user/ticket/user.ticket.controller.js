@@ -113,7 +113,7 @@ exports.getOneTicket= async(req, res) => {
                 statusCode: 400
             })
         }
-    }catch{
+    }catch(error){
         console.log(error);
         res.status(500).send({
             status: false,
@@ -143,7 +143,7 @@ exports.getAllTickets= async(req, res) => {
                 statusCode: 400
             })
         }
-    }catch{
+    }catch(error){
         console.log(error);
         res.status(500).send({
             status: false,

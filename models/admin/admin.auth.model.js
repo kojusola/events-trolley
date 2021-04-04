@@ -20,6 +20,13 @@ const adminUserSchema = mongoose.Schema({
         min: 3,
         max: 255
     },
+    role:{
+        type: String,
+        type: String,
+        required: true,
+        min: 3,
+        max: 255
+    },
     refreshJWT:{
         type:Object,
         token:{

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+var mongoosePaginate = require('mongoose-paginate');
 
 const ticketModel = mongoose.Schema({
     vendorId : String,
@@ -55,4 +56,7 @@ const ticketModel = mongoose.Schema({
         default: false
     }
 },{timestamps: true})
+
+ticketModel.plugin(mongoosePaginate);
+
 module.exports = mongoose.model('ticket', ticketModel);
