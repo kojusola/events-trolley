@@ -44,10 +44,10 @@ exports.getAllUsersProfile= async(req, res) => {
                 status: true,
                 msg: 'Profiles request successful.',
                 data: {
-                    tickets:Profiles.docs,
+                    Users:Profiles.docs,
                     page:Profiles.page,
                     pages:Profiles.pages,
-                    totalTickets: Profiles.total,
+                    totalUsers: Profiles.total,
                     limit:Profiles.limit
                 },
                 statusCode: 200
@@ -92,10 +92,10 @@ exports.getUsersProfileByRole = async(req, res) => {
                 status: true,
                 msg: 'Profiles request successful.',
                 data: {
-                    tickets:Profiles.docs,
+                    Users:Profiles.docs,
                     page:Profiles.page,
                     pages:Profiles.pages,
-                    totalTickets: Profiles.total,
+                    totalUsers: Profiles.total,
                     limit:Profiles.limit
                 },
                 statusCode: 200
