@@ -4,7 +4,9 @@ const { verifyAccessToken } = require('../createVerifytoken');
 
  const verifyToken = async function (req,res,next){
      const { authorization } = req.headers;
+     console.log(authorization)
     const decoded = await verifyAccessToken(authorization);
+    console.log(decoded);
     // if(decoded.email){
     //     const userId = await getJWT(authorization)
     //     if(!userId){
@@ -15,6 +17,7 @@ const { verifyAccessToken } = require('../createVerifytoken');
     // }
     // deleteJWT( authorization )
     if(decoded.users){
+        console.log(1)
         const userId = await decoded.users
         const userRole = await decoded.role
         req.userRole = await userRole

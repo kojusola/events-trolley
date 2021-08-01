@@ -16,5 +16,7 @@ router.post('/buy',ticketController.buyTicket);
 router.post('/user/buy',verifyToken,ticketController.regBuyTicket);
 router.get('/all',verifyToken,restrictTo("admin"),adminTicketController.getAllTickets);
 router.get('/verify',verifyToken,restrictTo("admin"),adminTicketController.verifyTicket);
+router.get('/revoke',verifyToken,restrictTo("admin"),adminTicketController.revokeTicket);
+router.get('/endors',verifyToken,restrictTo("admin"),adminTicketController.getAllVendors);
 
 module.exports = router;
