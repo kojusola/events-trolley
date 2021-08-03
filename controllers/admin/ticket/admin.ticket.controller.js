@@ -160,7 +160,7 @@ exports.updateVendorPayoutPercentage = async(req, res) => {
         };
         const payoutPercentage = await parseInt(req.body.vendorPayoutPercentage);
         const profile = await profileModel.findOneAndUpdate({"userId":req.query.userId}
-        ,{"$set":{"vendorPayoutPercentage":payoutPercentage}},{new:true});
+        ,{"vendorPayoutPercentage":payoutPercentage},{new:true});
         if(profile){
             res.status(200).json({
                 status: true,
@@ -170,7 +170,7 @@ exports.updateVendorPayoutPercentage = async(req, res) => {
         }else{
             res.status(400).json({
                 status: false,
-                msg: 'Vendor Payment Percentage Updated: Vendor Profile does not exist',
+                msg: 'Vendor Profile does not exist',
                 statusCode: 400
             })
         }

@@ -51,15 +51,15 @@ exports.overview= async(req, res) => {
                 console.log(count)
             }
             }});
-        const bestSellingTickets = await ticketBoughtModel.aggregate([{$group:{_id:"$ticketId",total_tickets:{$sum:1}}},
-        {$sort:{total_tickets: -1}}]).allowDiskUse(true);
+        const bestSellingTickets = await ticketBoughtModel.aggregate([{$unwind:'$ticketBoughtModel'},{$group:{_id:"$ticketId",total_tickets:{$sum:1}}},
+        {$sort:{total_tickets: -1}}, {$limit: 5}]).allowDiskUse(true);
         const Revenue = await accountModel.findOne({userId:"admin"});
         if(ticket){
             res.status(200).json({
                 status: true,
                 msg: 'Ticket request successful.',
                 data: {
-                    ticket,
+                    ticket, 
                     ticketsBought,
                     vendors,
                     customers,
