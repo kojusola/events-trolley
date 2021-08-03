@@ -12,7 +12,8 @@ const newTicketValidation = (data) => {
         ticketStartDate: joi.string().required(),
         ticketEndDate: joi.string().required(),
         category:joi.string().required(),
-        categories: joi.string().required(),
+        // categories: joi.string().required(),
+        categories: joi.array(),
         // categories: joi.array().items(joi.object({
         //     ticketName:joi.string().required(),
         //     description:joi.string().required(),
