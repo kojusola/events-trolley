@@ -4,6 +4,6 @@ const { verifyToken, restrictTo } = require('../../middlewares/authorization.mid
 
 
 router.get('/', verifyToken, adminController.adminProfile);
-router.get('/overview', adminController.overview);
+router.get('/overview',verifyToken,adminController.overview);
 
 module.exports = router;
