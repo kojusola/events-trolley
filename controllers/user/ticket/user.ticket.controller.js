@@ -374,7 +374,21 @@ exports.regBuyTicket = async (req, res) => {
         for (let i =0; i<tickets.length; i++){
             const ticket =  await ticketModel.findOneAndUpdate({"_id":req.body.ticketId,"categories.ticketName":tickets[i].ticketType },
             {$inc : {'categories.$.numberOfTickets': -1}}, opts);
-            let qrCodeImage = generateQR(`name : ${tickets[i].name}, TicketName: ${tickets[i].ticketType}`)
+            const ticketsBought = new ticketBoughtModel({
+                vendorId: req.body.vendorId,
+                customerId: req.body.userId,
+                ticketId: req.body.ticketId,
+                ticketUserName:tickets[i].name,
+                ticketType: tickets[i].ticketType,
+                eventName:ticketDetails.eventName,
+                eventVenue:ticketDetails.eventVenue,
+                eventTime:ticketDetails.eventTime,
+                venueAddress:  ticketDetails.venueAddress,
+                eventStartDate:  ticketDetails.eventStartDate,
+                eventEndDate: ticketDetails.eventEndDate
+            });
+            await ticketsBought.save(opts);
+            let qrCodeImage = generateQR(`name : ${tickets[i].name}, TicketName: ${tickets[i].ticketType}, ticketId: ${ticketsBought._id}`)
             let ticketUserName = tickets[i].name
             let fileBuffer = await htmlToPdfBuffer("receipt.ejs",{
                 ticketUserName
@@ -385,20 +399,6 @@ exports.regBuyTicket = async (req, res) => {
               }
               console.log(fileObject)
               attachments.push(fileObject);
-              const ticketsBought = new ticketBoughtModel({
-                vendorId: req.body.vendorId,
-                customerId: req.body.userId,
-                ticketId: req.body.ticketId,
-                ticketUserName:ticketUserName,
-                ticketType: tickets[i].ticketType,
-                eventName:ticketDetails.eventName,
-                eventVenue:ticketDetails.eventVenue,
-                eventTime:ticketDetails.eventTime,
-                venueAddress:  ticketDetails.venueAddress,
-                eventStartDate:  ticketDetails.eventStartDate,
-                eventEndDate: ticketDetails.eventEndDate
-            });
-            await ticketsBought.save(opts);
         }
         const email = sendTicket({attachments:attachments,
             customerName:  customerDetails.fullname , email: customerDetails.email});
@@ -527,4 +527,35 @@ exports.buyTicket = async (req, res) => {
         });
     }
 
+}
+
+exports.confirmTickets= async(req, res) => {
+    try{
+        const tickets = await ticketsBought.findOneAndUpdate({"_id":req.query.ticketId}
+        ,{"checkIn":true},{new:true});
+        if(tickets){
+            res.status(200).json({
+                status: true,
+                msg: 'Ticket checkIn successful',
+                data: {
+                    tickets
+                },
+                statusCode: 200
+            })
+        }else{
+            res.status(400).json({
+                status: false,
+                msg: 'There are no tickets by this Id',
+                statusCode: 400
+            })
+        }
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
 }
