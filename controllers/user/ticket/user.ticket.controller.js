@@ -559,3 +559,33 @@ exports.confirmTickets= async(req, res) => {
         });
     }
 }
+
+exports.boughtTicket= async(req, res) => {
+    try{
+        const tickets = await ticketsBought.find({"vendorId":req.userId});
+        if(tickets){
+            res.status(200).json({
+                status: true,
+                msg: 'bought ticket request successful',
+                data: {
+                    tickets
+                },
+                statusCode: 200
+            })
+        }else{
+            res.status(400).json({
+                status: false,
+                msg: 'There are no tickets by his vendor',
+                statusCode: 400
+            })
+        }
+    }catch(error){
+        console.log(error);
+        res.status(500).send({
+            status: false,
+            msg: 'Internal Server Error',
+            data: null,
+            statusCode: 500
+        });
+    }
+}
