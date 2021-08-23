@@ -1,62 +1,76 @@
-const mongoose = require('mongoose');
-var mongoosePaginate = require('mongoose-paginate');
+const mongoose = require("mongoose");
+var mongoosePaginate = require("mongoose-paginate");
 
-const ticketModel = mongoose.Schema({
-    vendorId : String,
-    ticketImage :{
-        type: Object,
-        "avatar":{
-            type:String
-        },
-        "cloundinaryId":{
-            type:String
-        }
-    },
-    eventName:{
+const ticketModel = mongoose.Schema(
+  {
+    vendorId: String,
+    ticketImage: {
+      type: Object,
+      avatar: {
         type: String,
-        required: true,
-        min: 3,
-        max: 255
+      },
+      cloundinaryId: {
+        type: String,
+      },
     },
-    eventVenue:{
-        type:String,
-        required:true,
-        min: 3,
+    eventName: {
+      type: String,
+      required: true,
+      min: 3,
+      max: 255,
+    },
+    eventVenue: {
+      type: String,
+      required: true,
+      min: 3,
     },
     venueAddress: {
-        type:String
+      type: String,
     },
     eventStartDate: {
-        type: String
+      type: String,
     },
     eventEndDate: {
-        type: String
+      type: String,
     },
     eventTime: {
-        type: String
+      type: String,
     },
     ticketSaleStartDate: {
-        type: String
+      type: String,
     },
     ticketSaleEndDate: {
-        type: String
+      type: String,
     },
-    category:String,
-    categories:[{
+    email: {
+      type: String,
+    },
+    mobileNumber: {
+      type: String,
+    },
+    description: {
+      type: String,
+    },
+    category: String,
+    categories: [
+      {
         ticketName: String,
         description: String,
         numberOfTickets: Number,
-        price:{
-            type: String,
-            default: null
-        }
-    }],
-    verified:{
-        type: Boolean,
-        default: false
-    }
-},{timestamps: true})
+        price: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
+    verified: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 ticketModel.plugin(mongoosePaginate);
 
-module.exports = mongoose.model('ticket', ticketModel);
+module.exports = mongoose.model("ticket", ticketModel);
