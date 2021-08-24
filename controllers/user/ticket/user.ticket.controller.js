@@ -75,6 +75,7 @@ exports.createNewTicket = async (req, res) => {
     const vendor = await profileModel.findOneAndUpdate(
       { userId: ticket.vendorId },
       { $push: { ticket: ticket } },
+      null,
       opts
     );
     console.log(vendor);
@@ -516,18 +517,18 @@ exports.buyTicket = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const status = await transactionStatus({
-      paymentReference: req.body.paymentReference,
-    });
-    console.log(status);
-    if (status.responseBody.paymentStatus !== "PAID") {
-      res.status(400).send({
-        status: false,
-        msg: "Payment Failed",
-        data: null,
-        statusCode: 400,
-      });
-    }
+    // const status = await transactionStatus({
+    //   paymentReference: req.body.paymentReference,
+    // });
+    // console.log(status);
+    // if (status.responseBody.paymentStatus !== "PAID") {
+    //   res.status(400).send({
+    //     status: false,
+    //     msg: "Payment Failed",
+    //     data: null,
+    //     statusCode: 400,
+    //   });
+    // }
     const opts = { session, new: true };
     const ticketDetails = await ticketModel.findOne({ _id: req.body.ticketId });
     if (!ticketDetails) {
