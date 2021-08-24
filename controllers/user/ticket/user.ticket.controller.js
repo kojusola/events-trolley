@@ -644,6 +644,7 @@ exports.confirmTickets = async (req, res) => {
       { checkIn: true },
       { new: true }
     );
+    console.log(tickets);
     if (tickets) {
       res.status(200).json({
         status: true,
