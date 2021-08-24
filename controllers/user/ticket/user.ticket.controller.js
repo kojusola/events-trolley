@@ -673,7 +673,7 @@ exports.confirmTickets = async (req, res) => {
 
 exports.boughtTicket = async (req, res) => {
   try {
-    const tickets = await ticketsBought.find({ vendorId: req.userId });
+    const tickets = await ticketBoughtModel.find({ vendorId: req.userId });
     if (tickets) {
       res.status(200).json({
         status: true,
