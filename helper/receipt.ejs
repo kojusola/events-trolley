@@ -17,13 +17,13 @@
     body {
       font-family: "Inter", sans-serif;
       color: #222831;
+      height: 100vh;
     }
 
     section.wrapper {
-      width: 800px;
+      width: 400px;
       height: 400px;
       border: 6px solid red;
-      background-color: #f4f9f9;
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
@@ -36,13 +36,6 @@
     section.wrapper div.compartment {
       width: 100%;
       padding: 1em;
-    }
-
-    section.wrapper div.compartment:nth-of-type(1) {
-      -webkit-box-flex: 20%;
-      -ms-flex: 20%;
-      flex: 20%;
-      border-right: 6px solid red;
     }
 
     section.wrapper div.compartment:nth-of-type(2) {
@@ -157,6 +150,7 @@
 
     section.wrapper div.compartment:nth-of-type(3) .inside div {
       height: 100%;
+      width: 100%;
       padding: 1em;
     }
 
@@ -203,13 +197,20 @@
       font-weight: bold;
       text-transform: uppercase;
     }
+
+    .qrLogo {
+      width: "400px";
+      height: "400px";
+    }
+    .ticketLogo {
+      width: "300px";
+      height: "300px";
+    }
   </style>
   <body>
     <main>
       <section class="wrapper">
-        <div class="compartment">
-          <p>Barcode here</p>
-        </div>
+        <div class="compartment"></div>
         <div class="compartment">
           <div class="section">
             <p class="header">Event Name:</p>
@@ -240,13 +241,17 @@
           <div class="inside">
             <div>
               <div>
-                <img src="<%= logo %>" alt="ticketer logo" />
+                <img class="ticketLogo" src="<%= logo %>" alt="ticketer logo" />
               </div>
               <p class="header">ID:</p>
               <p class="content"><%= ticketsId %></p>
             </div>
             <div>
-              <img src="<%= qrCodeImage %>" alt="ticketer logo" />
+              <img
+                class="qrLogo"
+                src="<%= qrCodeImage %>"
+                alt="ticketer logo"
+              />
             </div>
           </div>
         </div>

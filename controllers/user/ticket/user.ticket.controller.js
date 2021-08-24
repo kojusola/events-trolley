@@ -577,7 +577,7 @@ exports.buyTicket = async (req, res) => {
       );
       let ticketUserName = tickets[i].name;
       const ticketsBought = new ticketBoughtModel({
-        vendorId: req.body.vendorId,
+        vendorId: ticketDetails.vendorId,
         customerId: req.body.userId,
         ticketId: req.body.ticketId,
         ticketUserName: ticketUserName,
