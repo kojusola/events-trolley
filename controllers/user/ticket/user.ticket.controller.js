@@ -639,7 +639,7 @@ exports.buyTicket = async (req, res) => {
 
 exports.confirmTickets = async (req, res) => {
   try {
-    const tickets = await ticketsBought.findOneAndUpdate(
+    const tickets = await ticketBoughtModel.findOneAndUpdate(
       { _id: req.query.ticketId },
       { checkIn: true },
       { new: true }
