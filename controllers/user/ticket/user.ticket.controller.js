@@ -47,6 +47,7 @@ exports.createNewTicket = async (req, res) => {
     const opts = { session, new: true };
     const vendorDetails = await profileModel.findOne(
       { userId: req.userId },
+      null,
       opts
     );
     const ticket = new ticketModel({
@@ -75,7 +76,6 @@ exports.createNewTicket = async (req, res) => {
     const vendor = await profileModel.findOneAndUpdate(
       { userId: ticket.vendorId },
       { $push: { ticket: ticket } },
-      null,
       opts
     );
     console.log(vendor);
