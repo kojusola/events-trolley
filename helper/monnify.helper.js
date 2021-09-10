@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const getHeader = async function () {
   try {
     const header = await axios.post(
-      "https://sandbox.monnify.com/api/v1/auth/login/",
+      "https://api.monnify.com/api/v1/auth/login/",
       {},
       {
         headers: {
@@ -85,7 +85,7 @@ const payOut = async function ({
   try {
     if (header.requestSuccessful) {
       const payOut = await axios.post(
-        "https://sandbox.monnify.com/api/v2/disbursements/single",
+        "https://api.monnify.com/api/v2/disbursements/single",
         {
           amount: amount,
           reference: transactionReference,
@@ -110,7 +110,7 @@ const payOut = async function ({
 const validateOtp = async function ({ reference, authorizationCode }) {
   try {
     const validate = await axios.post(
-      "http://sandbox.monnify.com/api/v2/disbursements/single/validate-otp",
+      "http://api.monnify.com/api/v2/disbursements/single/validate-otp",
       {
         reference: reference,
         authorizationCode: authorizationCode,
@@ -148,7 +148,7 @@ const calculateHash = async function ({
 const transactionStatus = async function ({ paymentReference }) {
   try {
     const status = await axios.get(
-      `https://sandbox.monnify.com/api/v1/merchant/transactions/query?paymentReference=${paymentReference}`,
+      `https://api.monnify.com/api/v1/merchant/transactions/query?paymentReference=${paymentReference}`,
       {
         headers: {
           Authorization: `Basic ${process.env.MONNIFY_API_SECRET_KEY}`,
