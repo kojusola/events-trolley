@@ -10,6 +10,9 @@ const ticketModel = require("../models/user/ticket.model");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
+  tls: {
+    ciphers: "SSLv3",
+  },
   auth: {
     user: "eventstrolleys@gmail.com",
     pass: process.env.EMAIL_PASS,
