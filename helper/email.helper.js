@@ -100,10 +100,11 @@ const sendTicket = async ({ attachments, eventName, customerName, email }) => {
   var info = {
     from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
     to: email, // list of receivers
-    subject: "Ticket Receipt", // Subject line
+    subject: "Ticket Booked", // Subject line
     text: `Hello ${customerName}`, // plain text body
     html: `<p><b>Hello ${customerName},</b><p>
-            <p>Kindly find attached your ticket for <b>${eventName}</b> </p>`, // html body
+            <p>Kindly find attached your ticket for <b>${eventName}</b> </p>
+            <p>Thank you</p>`, // html body
     attachments: attachments,
   };
   send(info);
