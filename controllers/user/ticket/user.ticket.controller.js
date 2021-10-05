@@ -480,6 +480,7 @@ exports.regBuyTicket = async (req, res) => {
     const email = sendTicket({
       attachments: attachments,
       customerName: customerDetails.fullname,
+      eventName: ticketDetails.eventName,
       email: customerDetails.email,
     });
 
@@ -613,6 +614,7 @@ exports.buyTicket = async (req, res) => {
     const email = await sendTicket({
       attachments: attachments,
       customerName: req.body.customerName,
+      eventName: ticketDetails.eventName,
       email: req.body.customerEmail,
     });
 
@@ -784,6 +786,7 @@ exports.freeTicket = async (req, res) => {
     const email = await sendTicket({
       attachments: attachments,
       customerName: req.body.customerName,
+      eventName: ticketDetails.eventName,
       email: req.body.customerEmail,
     });
 

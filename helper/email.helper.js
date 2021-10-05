@@ -96,14 +96,14 @@ const getPinByEmailPin = (email, pin, schema) => {
     }
   });
 };
-const sendTicket = async ({ attachments, customerName, email }) => {
+const sendTicket = async ({ attachments, eventName, customerName, email }) => {
   var info = {
     from: '"Events Trolley" eventstrolleys@gmail.com', // sender address
     to: email, // list of receivers
     subject: "Ticket Receipt", // Subject line
     text: `Hello ${customerName}`, // plain text body
     html: `<p><b>Hello ${customerName},</b><p>
-            <p>These are your receipts. Thank you patronizing Events trolley</p>`, // html body
+            <p>Kindly find attached your ticket for <b>${eventName}</b> </p>`, // html body
     attachments: attachments,
   };
   send(info);
