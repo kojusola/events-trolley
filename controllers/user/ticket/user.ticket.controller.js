@@ -81,7 +81,6 @@ exports.createNewTicket = async (req, res) => {
       { $push: { ticket: ticket } },
       opts
     );
-    console.log(vendor);
     await session.commitTransaction();
     session.endSession();
     if (vendor) {
