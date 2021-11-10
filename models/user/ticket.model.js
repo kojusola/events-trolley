@@ -13,6 +13,10 @@ const ticketModel = mongoose.Schema(
         type: String,
       },
     },
+    slugEventName: {
+      type: String,
+      required: true,
+    },
     eventName: {
       type: String,
       required: true,

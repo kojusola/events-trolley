@@ -1,4 +1,5 @@
 const ticketBoughtModel = require("../../../models/user/ticketsBought");
+const slug = require("slug");
 const { v4 } = require("uuid");
 const {
   newTicketValidation,
@@ -50,7 +51,9 @@ exports.createNewTicket = async (req, res) => {
       null,
       opts
     );
+    const slugName = slug(req.body.eventName);
     const ticket = new ticketModel({
+      slugEventName: slugName,
       vendorId: req.userId,
       eventName: req.body.eventName,
       eventVenue: req.body.eventVenue,
