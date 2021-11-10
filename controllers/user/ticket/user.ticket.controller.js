@@ -114,7 +114,7 @@ exports.createNewTicket = async (req, res) => {
 
 exports.getOneTicket = async (req, res) => {
   try {
-    const ticket = await ticketModel.findOne({ _id: req.query.ticket_id });
+    const ticket = await ticketModel.findOne({ slugEventName: req.query.slug });
     if (ticket) {
       res.status(200).json({
         status: true,
